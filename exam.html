@@ -1,1 +1,211 @@
 
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>الامتحان - منصة THE BEST</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: radial-gradient(circle at 10% 30%, #0a0f1a, #020408);
+      padding: 20px;
+      min-height: 100vh;
+    }
+    .container { max-width: 600px; margin: 0 auto; }
+    .exam-header {
+      background: rgba(20,28,36,0.8);
+      backdrop-filter: blur(12px);
+      border-radius: 28px;
+      padding: 16px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .question-card {
+      background: rgba(20,28,36,0.75);
+      backdrop-filter: blur(12px);
+      border-radius: 28px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 20px 0;
+    }
+    .option {
+      background: rgba(255,255,255,0.1);
+      padding: 14px;
+      border-radius: 60px;
+      cursor: pointer;
+      transition: 0.2s;
+      border: 1px solid transparent;
+    }
+    .option.selected { background: #ffd966; color: #000; border-color: #ffd966; }
+    .timer { color: #ffd966; font-weight: bold; }
+    .nav-buttons { display: flex; gap: 12px; margin-top: 20px; }
+    .btn {
+      flex: 1;
+      padding: 12px;
+      border-radius: 60px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .btn-primary { background: #ffd966; color: #000; }
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e2a32ee;
+      backdrop-filter: blur(16px);
+      padding: 10px 24px;
+      border-radius: 60px;
+      color: #ffec9f;
+      z-index: 9999;
+    }
+  </style>
+</head>
+<body>
+<div class="container" id="app">
+  <!-- سيتم ملء المحتوى ديناميكياً -->
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAFrf9kRQez8ltkvd66_BQZPmARc1fW6y8",
+    authDomain: "date-student.firebaseapp.com",
+    databaseURL: "https://date-student-default-rtdb.firebaseio.com",
+    projectId: "date-student",
+    storageBucket: "date-student.firebasestorage.app",
+    messagingSenderId: "952213529741",
+    appId: "1:952213529741:web:7a8d8da275214b5754eec4"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const examId = urlParams.get('id'); // مثلاً exam_123
+  const studentCode = localStorage.getItem('studentCode');
+  if (!studentCode || !examId) { alert('بيانات غير مكتملة'); window.location.href = 'subjects-e.html'; }
+
+  let examData = null;
+  let questions = [];
+  let currentIndex = 0;
+  let answers = {};
+  let timerInterval = null;
+  let timeLeft = 0;
+
+  function showToast(msg) {
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.innerText = msg;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+  }
+
+  async function loadExam() {
+    const snapshot = await db.ref(`exams/${examId}`).once('value');
+    examData = snapshot.val();
+    if (!examData) {
+      document.getElementById('app').innerHTML = '<div class="exam-header">❌ الامتحان غير موجود</div>';
+      return;
+    }
+    questions = examData.questions || [];
+    timeLeft = (examData.duration_minutes || 30) * 60;
+    renderQuestion();
+    startTimer();
+  }
+
+  function renderQuestion() {
+    if (!questions.length) return;
+    const q = questions[currentIndex];
+    const selected = answers[q.id] || '';
+    const html = `
+      <div class="exam-header">
+        <span>📝 ${examData.title}</span>
+        <span class="timer" id="timer">${formatTime(timeLeft)}</span>
+      </div>
+      <div class="question-card">
+        <div style="font-size:1.2rem; font-weight:bold;">${q.text}</div>
+        <div class="options" id="optionsContainer">
+          ${q.options.map(opt => `
+            <div class="option ${selected === opt ? 'selected' : ''}" data-value="${opt}">${opt}</div>
+          `).join('')}
+        </div>
+        <div class="nav-buttons">
+          <button class="btn" id="prevBtn" ${currentIndex === 0 ? 'disabled' : ''}>السابق</button>
+          <button class="btn btn-primary" id="nextBtn">${currentIndex === questions.length-1 ? 'إنهاء' : 'التالي'}</button>
+        </div>
+      </div>
+    `;
+    document.getElementById('app').innerHTML = html;
+    // إعادة ربط الأحداث
+    document.querySelectorAll('.option').forEach(opt => {
+      opt.addEventListener('click', (e) => {
+        const value = opt.getAttribute('data-value');
+        answers[q.id] = value;
+        renderQuestion(); // إعادة رسم لتحديث الاختيار
+      });
+    });
+    document.getElementById('prevBtn')?.addEventListener('click', () => { if (currentIndex > 0) { currentIndex--; renderQuestion(); } });
+    document.getElementById('nextBtn')?.addEventListener('click', () => {
+      if (currentIndex === questions.length-1) finishExam();
+      else { currentIndex++; renderQuestion(); }
+    });
+  }
+
+  function startTimer() {
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        finishExam();
+      } else {
+        timeLeft--;
+        const timerSpan = document.getElementById('timer');
+        if (timerSpan) timerSpan.innerText = formatTime(timeLeft);
+      }
+    }, 1000);
+  }
+
+  function formatTime(sec) {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${m}:${s.toString().padStart(2,'0')}`;
+  }
+
+  async function finishExam() {
+    clearInterval(timerInterval);
+    let score = 0;
+    for (let i = 0; i < questions.length; i++) {
+      const q = questions[i];
+      if (answers[q.id] === q.correct) score += (q.points || 1);
+    }
+    const total = questions.reduce((sum, q) => sum + (q.points || 1), 0);
+    const percentage = Math.round((score/total)*100);
+    // حفظ النتيجة في Firebase
+    await db.ref(`progress/${studentCode}/exams/${examId}`).set({
+      score: score,
+      total: total,
+      percentage: percentage,
+      completedAt: Date.now(),
+      answers: answers
+    });
+    showToast(`🎉 نتيجتك: ${score}/${total} (${percentage}%)`);
+    setTimeout(() => { window.location.href = 'subjects-e.html'; }, 2000);
+  }
+
+  loadExam();
+</script>
+</body>
+</html>
