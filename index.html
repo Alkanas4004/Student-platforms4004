@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -32,11 +31,9 @@
       border: 1px solid rgba(255,215,0,0.3);
       box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
       text-align: center;
-      transition: 0.3s;
     }
     body.light-mode .glass-card {
       background: rgba(255, 255, 255, 0.85);
-      border-color: rgba(0,0,0,0.1);
     }
     .logo-icon { font-size: 5rem; margin-bottom: 10px; }
     h1 {
@@ -47,23 +44,20 @@
       background-clip: text;
       color: transparent;
     }
-    .subtitle { color: #a0aec0; margin-bottom: 32px; font-size: 1rem; }
-    body.light-mode .subtitle { color: #4a5568; }
-    .code-input-group { margin-bottom: 28px; }
+    .subtitle { color: #a0aec0; margin-bottom: 32px; }
     .code-wrapper {
       background: rgba(0,0,0,0.3);
       border-radius: 60px;
       display: flex;
       align-items: center;
       border: 1px solid #ffd966;
-      transition: 0.2s;
+      margin-bottom: 24px;
     }
-    body.light-mode .code-wrapper { background: #fff; }
     .code-icon { font-size: 1.8rem; padding: 0 16px; color: #ffd966; }
     #code-input {
       flex: 1;
-      border: none;
       background: transparent;
+      border: none;
       padding: 18px 10px;
       font-size: 1.4rem;
       text-align: center;
@@ -74,22 +68,16 @@
       font-family: monospace;
     }
     body.light-mode #code-input { color: #1e2a3a; }
-    #code-input::placeholder { letter-spacing: 0; font-size: 0.9rem; color: #94a3b8; }
     .login-btn {
       width: 100%;
       padding: 16px;
       background: linear-gradient(135deg, #ffd966, #ffb347);
       border: none;
       border-radius: 60px;
-      font-size: 1.2rem;
       font-weight: bold;
-      color: #1e2a3a;
+      font-size: 1.2rem;
       cursor: pointer;
       transition: 0.3s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
     }
     .login-btn:hover { transform: translateY(-2px); filter: brightness(1.05); }
     .error-message {
@@ -111,12 +99,13 @@
       padding: 10px 24px;
       border-radius: 60px;
       color: #ffec9f;
-      font-weight: bold;
       z-index: 9999;
-      border-right: 4px solid #ffd966;
       animation: fadeUp 0.3s;
     }
-    @keyframes fadeUp { from { opacity: 0; bottom: 0; } to { opacity: 1; bottom: 30px; } }
+    @keyframes fadeUp {
+      from { opacity: 0; bottom: 0; }
+      to { opacity: 1; bottom: 30px; }
+    }
     .toggle-dark {
       position: absolute;
       top: 20px;
@@ -149,12 +138,10 @@
 <div class="glass-card">
   <div class="logo-icon">🎓</div>
   <h1>منصة THE BEST</h1>
-  <p class="subtitle">أدخل كود الاشتراك الخاص بك</p>
-  <div class="code-input-group">
-    <div class="code-wrapper">
-      <span class="code-icon">🔑</span>
-      <input type="text" id="code-input" placeholder="مثال: STUDENT2026" maxlength="20" autocomplete="off">
-    </div>
+  <p class="subtitle">أدخل كود الدخول الخاص بك</p>
+  <div class="code-wrapper">
+    <span class="code-icon">🔑</span>
+    <input type="text" id="code-input" placeholder="كود المدرس أو الطالب" maxlength="20" autocomplete="off">
   </div>
   <button class="login-btn" id="loginBtn"><i class="fas fa-sign-in-alt"></i> دخول</button>
   <div id="errorMsg" class="error-message"></div>
@@ -199,31 +186,61 @@
     loginBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> جاري التحقق...';
 
     try {
-      const snapshot = await db.ref(`codes/${code}`).once('value');
-      const studentData = snapshot.val();
-      if (!studentData) {
+      // 1. البحث في مسار الطلاب (codes)
+      let studentSnap = await db.ref(`codes/${code}`).once('value');
+      let userData = studentSnap.val();
+      let userType = 'student';
+      let userId = code;
+      let yearId = userData?.yearId;
+      let subjectIds = userData?.subjectIds || [];
+
+      // 2. إذا لم يوجد في codes، نبحث في teachers باستخدام حقل password
+      if (!userData) {
+        const teachersSnap = await db.ref('teachers').once('value');
+        let foundTeacher = null;
+        teachersSnap.forEach(child => {
+          if (child.val().password === code) {
+            foundTeacher = { id: child.key, ...child.val() };
+          }
+        });
+        if (foundTeacher) {
+          userData = foundTeacher;
+          userType = 'teacher';
+          userId = foundTeacher.phone;
+          yearId = foundTeacher.yearId || 'year_2026';
+          subjectIds = foundTeacher.subjectIds || [];
+        }
+      }
+
+      if (!userData) {
         showToast('❌ كود غير صالح');
         loginBtn.disabled = false;
         loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> دخول';
         return;
       }
-      // تخزين بيانات الطالب وجلسة الدخول
+
+      // تخزين جلسة الدخول
       const session = {
         code: code,
-        studentName: studentData.studentName,
-        phone: studentData.phone,
-        grade: studentData.grade,
-        subscription: studentData.subscription,
-        expiryDate: studentData.expiryDate,
-        yearId: studentData.yearId,
-        subjectIds: studentData.subjectIds || [],
-        teacherIds: studentData.teacherIds || []
+        userType: userType,
+        userId: userId,
+        name: userData.name || userData.studentName,
+        phone: userData.phone,
+        grade: userData.grade,
+        subscription: userData.subscription || 'active',
+        expiryDate: userData.expiryDate,
+        yearId: yearId,
+        subjectIds: subjectIds,
+        teacherIds: userData.teacherIds || []
       };
-      localStorage.setItem('currentStudent', JSON.stringify(session));
-      localStorage.setItem('studentCode', code);
-      localStorage.setItem('studentName', studentData.studentName);
-      showToast('✅ تم تسجيل الدخول بنجاح');
-      setTimeout(() => { window.location.href = 'subjects-e.html'; }, 1000);
+      localStorage.setItem('currentUser', JSON.stringify(session));
+      localStorage.setItem('userCode', code);
+      localStorage.setItem('userType', userType);
+      
+      showToast(`✅ مرحباً ${session.name}`);
+      setTimeout(() => {
+        window.location.href = 'subjects-e.html';
+      }, 1000);
     } catch (err) {
       console.error(err);
       showToast('❌ خطأ في الاتصال بقاعدة البيانات');
