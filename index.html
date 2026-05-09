@@ -219,6 +219,12 @@
         return;
       }
 
+      // التأكد من وجود yearId (إذا لم يكن موجوداً، نستخدم الرقم الافتراضي)
+      if (!yearId) {
+        yearId = 'year_2026';
+        showToast('⚠️ تم استخدام السنة الافتراضية (2026)');
+      }
+
       // تخزين جلسة الدخول
       const session = {
         code: code,
@@ -233,9 +239,13 @@
         subjectIds: subjectIds,
         teacherIds: userData.teacherIds || []
       };
+      
+      // حفظ البيانات الأساسية المطلوبة لبقية الصفحات
       localStorage.setItem('currentUser', JSON.stringify(session));
+      localStorage.setItem('selected_year', JSON.stringify({ id: yearId, name: "السنة الدراسية" }));
       localStorage.setItem('userCode', code);
       localStorage.setItem('userType', userType);
+      localStorage.setItem('studentName', session.name);
       
       showToast(`✅ مرحباً ${session.name}`);
       setTimeout(() => {
