@@ -2,252 +2,440 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>الدروس - منصة THE BEST</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>المحاضرات - منصة THE BEST</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Cairo&display=swap');
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 
   body {
     font-family: 'Cairo', sans-serif;
-    background: #121212;
-    color: #fff;
-    padding: 80px 15px 30px;
-    margin: 0;
-    transition: background 0.3s, color 0.3s;
+    background: radial-gradient(circle at 10% 30%, #0a0f1a, #020408);
+    color: #f0f3f8;
+    padding: 80px 20px 40px;
+    transition: background 0.3s, color 0.2s;
+    min-height: 100vh;
   }
 
-  .topbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: #0f0f0f;
-    padding: 10px 15px;
-    color: white;
+  /* الوضع الفاتح */
+  body.light-mode {
+    background: #fafbfd;
+    color: #1e2a3a;
+  }
+  body.light-mode .glass-topbar {
+    background: rgba(255, 248, 225, 0.9);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+  body.light-mode .lecture-card {
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+    border: 1px solid rgba(0,0,0,0.05);
+  }
+  body.light-mode .lecture-title {
+    color: #b85c00;
+  }
+
+  /* الشريط العلوي الزجاجي */
+  .glass-topbar {
     position: fixed;
     top: 0;
-    right: 0;
     left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    background: rgba(10, 20, 28, 0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255,215,0,0.25);
     z-index: 1000;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.2);
   }
 
-  .menu-btn {
-    font-size: 18px;
+  .back-btn {
+    background: rgba(255,215,0,0.12);
+    border: 1px solid #ffd966;
+    color: #ffd966;
+    padding: 6px 18px;
+    border-radius: 40px;
+    font-weight: bold;
     cursor: pointer;
-    background: rgba(255, 215, 0, 0.1);
-    border: 1px solid #ffd700;
-    color: #ffd700;
-    padding: 5px 9px;
-    border-radius: 8px;
+    transition: 0.2s;
+    font-size: 0.9rem;
+  }
+  .back-btn:hover {
+    background: #ffd966;
+    color: #000;
+    transform: translateX(-4px);
+  }
+
+  .page-title {
+    font-size: 1.4rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, #FFE6B0, #FFB347);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .icons-group {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+  }
+  .icon-circle {
+    width: 38px;
+    height: 38px;
+    background: rgba(255,240,180,0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.2s;
+    backdrop-filter: blur(4px);
+  }
+  .icon-circle:hover {
+    background: #ffd966;
+    transform: scale(1.05);
+  }
+  .icon-circle i {
+    font-size: 1.2rem;
+    color: #ffecb3;
+  }
+  body.light-mode .icon-circle i {
+    color: #b85c00;
+  }
+
+  /* زر التبديل الليلي */
+  .toggle-switch {
+    width: 48px;
+    height: 24px;
+    background: #555;
+    border-radius: 30px;
+    position: relative;
+    cursor: pointer;
     transition: 0.3s;
   }
-
-  .menu-btn:hover {
-    background: rgba(255, 215, 0, 0.2);
-    transform: translateY(-1px);
+  .toggle-switch.active {
+    background: #ffd966;
+  }
+  .toggle-switch::after {
+    content: "🌙";
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.3s;
+  }
+  .toggle-switch.active::after {
+    content: "☀️";
+    right: 24px;
   }
 
-  .title {
-    font-size: 15px;
-    font-weight: bold;
-    color: #ffd700;
-    letter-spacing: 1px;
-  }
-
+  /* العنوان الرئيسي */
   h1 {
-    color: #ffd700;
+    font-size: 2.5rem;
     text-align: center;
-    margin-bottom: 20px;
-    text-shadow: 0 0 8px #ffd700;
-    font-size: 1.6rem;
+    margin: 20px 0 40px;
+    font-weight: 900;
+    background: linear-gradient(145deg, #FFE6B0, #FFAA33);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
 
-  ul {
-    list-style: none;
-    padding: 0;
-    max-width: 500px;
+  /* شبكة المحاضرات */
+  .lectures-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 28px;
+    max-width: 1200px;
     margin: 0 auto;
   }
 
-  li {
-    background: #1a1a1a;
-    margin: 10px 0;
-    padding: 15px;
-    border-radius: 10px;
+  /* بطاقة المحاضرة */
+  .lecture-card {
+    background: rgba(20, 28, 36, 0.75);
+    backdrop-filter: blur(12px);
+    border-radius: 32px;
+    padding: 24px 20px;
+    transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    border: 1px solid rgba(255,215,0,0.3);
     cursor: pointer;
     text-align: center;
+    box-shadow: 0 14px 28px rgba(0,0,0,0.4);
+  }
+  .lecture-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    border-color: #ffd966;
+    box-shadow: 0 24px 40px rgba(255,215,0,0.25);
+  }
+
+  .lecture-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    color: #ffd966;
+  }
+
+  .lecture-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #ffdfa5;
+    margin-bottom: 12px;
+  }
+
+  .video-count {
+    background: rgba(255,215,0,0.15);
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 40px;
+    font-size: 0.85rem;
     font-weight: bold;
-    color: #ffd700;
-    transition: background 0.3s, transform 0.3s;
+    color: #ffd966;
+    margin-top: 8px;
   }
 
-  li:hover {
-    background: #333;
-    transform: translateY(-3px);
+  /* Skeleton loader */
+  .skeleton-card {
+    background: linear-gradient(90deg, #2a2f36 25%, #3a414b 50%, #2a2f36 75%);
+    background-size: 200% 100%;
+    animation: loading 1.4s infinite;
+    border-radius: 32px;
+    height: 200px;
+  }
+  @keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
   }
 
-  @media (max-width: 600px) {
-    body {
-      padding: 70px 10px 20px;
-    }
+  /* رسائل الخطأ */
+  .error-message {
+    text-align: center;
+    grid-column: 1 / -1;
+    background: rgba(255,70,70,0.2);
+    padding: 20px;
+    border-radius: 60px;
+    color: #ffb3b3;
+    border: 1px solid #ff8888;
+  }
 
-    h1 {
-      font-size: 1.3rem;
-    }
+  /* توست الإشعارات */
+  .toast-message {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e2a32ee;
+    backdrop-filter: blur(16px);
+    padding: 12px 28px;
+    border-radius: 60px;
+    color: #ffec9f;
+    font-weight: bold;
+    z-index: 9999;
+    border-right: 5px solid #ffd966;
+    animation: fadeUp 0.3s ease;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; bottom: 0; }
+    to { opacity: 1; bottom: 30px; }
+  }
 
-    li {
-      padding: 12px;
-      font-size: 0.95rem;
-    }
+  /* زر البروفايل العائم */
+  .profile-fab {
+    position: fixed;
+    bottom: 25px;
+    left: 25px;
+    background: #11161e;
+    width: 55px;
+    height: 55px;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.5);
+    cursor: pointer;
+    border: 2px solid #ffd966;
+    z-index: 1100;
+    transition: 0.2s;
+  }
+  .profile-fab:hover {
+    transform: scale(1.08);
+    background: #ffd966;
+  }
+  .profile-fab img {
+    width: 30px;
+  }
+  body.light-mode .profile-fab {
+    background: white;
+  }
 
-    .menu-btn {
-      font-size: 16px;
-      padding: 4px 8px;
-    }
-
-    .title {
-      font-size: 14px;
-    }
+  @media (max-width: 640px) {
+    .lectures-grid { gap: 20px; }
+    .lecture-title { font-size: 1.2rem; }
+    .glass-topbar { padding: 10px 16px; }
+    .page-title { font-size: 1rem; }
+    h1 { font-size: 1.8rem; }
   }
 </style>
 </head>
-
 <body>
 
-  <!-- الشريط العلوي -->
-  <div class="topbar">
-    <div class="menu-btn" id="backBtn">⬅</div>
-    <div class="title">𝑳𝒆𝒄𝒕𝒖𝒓𝒆𝒔</div>
+<div class="glass-topbar">
+  <button class="back-btn" id="backBtn">⬅️ رجوع</button>
+  <div class="page-title"><i class="fas fa-book-open"></i> 𝑳𝒆𝒄𝒕𝒖𝒓𝒆𝒔</div>
+  <div class="icons-group">
+    <div class="toggle-switch" id="darkToggle"></div>
+    <div class="icon-circle" id="shareBtn"><i class="fas fa-share-alt"></i></div>
+    <div class="icon-circle" id="whatsappBtn"><i class="fab fa-whatsapp"></i></div>
+    <div class="icon-circle" id="notifyBtn"><i class="far fa-bell"></i></div>
   </div>
+</div>
 
-  <h1>𝑳𝒆𝒄𝒕𝒖𝒓𝒆 – 𝟐𝟎𝟐𝟔</h1>
+<h1>📖 المحاضرات – 2026</h1>
+<div id="lecturesContainer" class="lectures-grid">
+  <div class="skeleton-card"></div>
+  <div class="skeleton-card"></div>
+  <div class="skeleton-card"></div>
+</div>
 
-  <ul id="lectures-list">
-    <li>⏳....𝑳𝒐𝒂𝒅𝒊𝒏𝒈</li>
-  </ul>
+<a href="profile.html" class="profile-fab" id="profileFab">
+  <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="بروفايل">
+</a>
 
-  <!-- ملفاتك زي ما هي -->
-  <script src="app.js"></script>
-  <script src="check_code.js"></script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getDatabase, ref, child, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-  <!-- كودك الأساسي -->
-  <script type="module">
-    const lecturesList = document.getElementById("lectures-list");
-    const backBtn = document.getElementById("backBtn");
+  // Firebase Config
+  const firebaseConfig = {
+    apiKey: "AIzaSyAFrf9kRQez8ltkvd66_BQZPmARc1fW6y8",
+    authDomain: "date-student.firebaseapp.com",
+    databaseURL: "https://date-student-default-rtdb.firebaseio.com",
+    projectId: "date-student",
+    storageBucket: "date-student.firebasestorage.app",
+    messagingSenderId: "952213529741",
+    appId: "1:952213529741:web:7a8d8da275214b5754eec4"
+  };
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
 
-    const selectedSubject = JSON.parse(localStorage.getItem("selected_subject"));
-    const selectedTeacher = JSON.parse(localStorage.getItem("selected_teacher"));
-    const selectedChapter = JSON.parse(localStorage.getItem("selected_chapter"));
+  // جلب البيانات من localStorage
+  const selectedYear = JSON.parse(localStorage.getItem("selected_year"));
+  const selectedSubject = JSON.parse(localStorage.getItem("selected_subject"));
+  const selectedTeacher = JSON.parse(localStorage.getItem("selected_teacher"));
+  const selectedChapter = JSON.parse(localStorage.getItem("selected_chapter"));
 
-    if (!selectedSubject || !selectedTeacher || !selectedChapter) {
-      lecturesList.innerHTML = '<li>⚠️ لم يتم تحديد المادة أو المدرس أو الفصل.</li>';
+  const lecturesContainer = document.getElementById("lecturesContainer");
+  const backBtn = document.getElementById("backBtn");
+
+  backBtn.onclick = () => window.location.href = "chapters-e.html";
+
+  // دالة عرض التوست
+  function showToast(msg, isError = false) {
+    const toast = document.createElement("div");
+    toast.className = "toast-message";
+    toast.innerHTML = isError ? `⚠️ ${msg}` : `✨ ${msg}`;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3500);
+  }
+
+  // تحميل المحاضرات من Firebase
+  async function loadLectures() {
+    if (!selectedYear || !selectedSubject || !selectedTeacher || !selectedChapter) {
+      lecturesContainer.innerHTML = `<div class="error-message">⚠️ البيانات المطلوبة غير مكتملة (السنة، المادة، المدرس، الفصل)</div>`;
+      return;
     }
 
-    backBtn.onclick = () => {
-      window.location.href = 'chapters-a.html';
-    };
+    try {
+      const path = `years/${selectedYear.id}/subjects/${selectedSubject.id}/teachers/${selectedTeacher.id}/chapters/${selectedChapter.id}/lectures`;
+      const snapshot = await get(child(ref(db), path));
+      const lecturesData = snapshot.val();
 
-    function normalize(str) {
-      return (str || "")
-        .trim()
-        .replace(/[.\s]/g, "")
-        .replace(/[أإآا]/g, "ا")
-        .toLowerCase();
-    }
-
-    async function loadLectures() {
-      if (!selectedSubject || !selectedTeacher || !selectedChapter) return;
-
-      try {
-        const res = await fetch("organized_output-a.json");
-        const data = await res.json();
-
-        const wantedSubject = normalize(selectedSubject.name);
-        const wantedTeacher = normalize(selectedTeacher.name);
-        const wantedChapter = normalize(selectedChapter.name);
-
-        let foundLectures = [];
-
-        (data || []).forEach(year => {
-          (year.subjects || []).forEach(sub => {
-            if (normalize(sub.name) === wantedSubject) {
-              (sub.teachers || []).forEach(t => {
-                if (normalize(t.name) === wantedTeacher) {
-                  (t.chapters || []).forEach(ch => {
-                    if (normalize(ch.name) === wantedChapter) {
-                      foundLectures = ch.lectures || [];
-                    }
-                  });
-                }
-              });
-            }
-          });
-        });
-
-        lecturesList.innerHTML = "";
-
-        if (foundLectures.length === 0) {
-          lecturesList.innerHTML = "<li>⚠️ لا توجد محاضرات لهذا الفصل.</li>";
-          return;
-        }
-
-        foundLectures.forEach(lec => {
-          const li = document.createElement("li");
-
-          const nameSpan = document.createElement("span");
-          nameSpan.textContent = lec.name;
-
-          const videoCount = document.createElement("div");
-          videoCount.style.fontSize = "0.85rem";
-          videoCount.style.color = "#ffd700";
-          videoCount.textContent = `${lec.videos?.length || 0} 𝑽𝒊𝒅𝒆𝒐`;
-
-          li.appendChild(nameSpan);
-          li.appendChild(videoCount);
-
-          li.onclick = () => {
-            localStorage.setItem(
-              'selected_lecture',
-              JSON.stringify({ name: lec.name })
-            );
-            window.location.href = 'videos-a.html';
-          };
-
-          lecturesList.appendChild(li);
-        });
-
-      } catch (err) {
-        console.error(err);
-        lecturesList.innerHTML = "<li>❌ حدث خطأ أثناء تحميل البيانات.</li>";
+      if (!lecturesData) {
+        lecturesContainer.innerHTML = `<div class="error-message">📭 لا توجد محاضرات في هذا الفصل بعد.</div>`;
+        return;
       }
+
+      lecturesContainer.innerHTML = "";
+
+      // تحويل الكائن إلى مصفوفة
+      const lecturesArray = Object.entries(lecturesData).map(([id, lecture]) => ({ id, ...lecture }));
+
+      for (const lecture of lecturesArray) {
+        const videosCount = lecture.videos ? Object.keys(lecture.videos).length : 0;
+
+        const card = document.createElement("div");
+        card.className = "lecture-card";
+        card.innerHTML = `
+          <div class="lecture-icon"><i class="fas fa-play-circle"></i></div>
+          <div class="lecture-title">${lecture.name}</div>
+          <div class="video-count">
+            <i class="fas fa-video"></i> ${videosCount} ${videosCount === 1 ? 'فيديو' : 'فيديوهات'}
+          </div>
+        `;
+
+        card.addEventListener("click", () => {
+          localStorage.setItem("selected_lecture", JSON.stringify({ id: lecture.id, name: lecture.name }));
+          window.location.href = "videos-e.html";
+        });
+
+        lecturesContainer.appendChild(card);
+      }
+    } catch (error) {
+      console.error(error);
+      lecturesContainer.innerHTML = `<div class="error-message">❌ حدث خطأ في الاتصال بقاعدة البيانات</div>`;
+      showToast("فشل تحميل المحاضرات", true);
     }
+  }
 
-    loadLectures();
-  </script>
+  loadLectures();
 
-  <!-- ================= Firebase (الإضافة الوحيدة) ================= -->
+  // ========== الوضع الليلي والفاتح ==========
+  const darkToggle = document.getElementById("darkToggle");
+  if (localStorage.getItem("theme") === "light") {
+    document.body.classList.add("light-mode");
+    darkToggle.classList.add("active");
+  }
+  darkToggle.addEventListener("click", () => {
+    document.body.classList.toggle("light-mode");
+    const isLight = document.body.classList.contains("light-mode");
+    localStorage.setItem("theme", isLight ? "light" : "dark");
+    darkToggle.classList.toggle("active", isLight);
+  });
 
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  // ========== مشاركة وواتساب ==========
+  const shareBtn = document.getElementById("shareBtn");
+  const whatsappBtn = document.getElementById("whatsappBtn");
+  const notifyBtn = document.getElementById("notifyBtn");
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyAFrf9kRQez8ltkvd66_BQZPmARc1fW6y8",
-      authDomain: "date-student.firebaseapp.com",
-      databaseURL: "https://date-student-default-rtdb.firebaseio.com",
-      projectId: "date-student",
-      storageBucket: "date-student.firebasestorage.app",
-      messagingSenderId: "952213529741",
-      appId: "1:952213529741:web:7a8d8da275214b5754eec4",
-      measurementId: "G-CNR9HYEGGF"
-    };
+  shareBtn.addEventListener("click", () => {
+    if (navigator.share) {
+      navigator.share({ title: "منصة THE BEST", text: "استعرض المحاضرات", url: location.href });
+    } else {
+      showToast("المشاركة غير مدعومة في هذا المتصفح", true);
+    }
+  });
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+  whatsappBtn.addEventListener("click", () => {
+    window.open(`https://wa.me/?text=${encodeURIComponent(location.href)}`, "_blank");
+  });
 
-    console.log("🔥 Firebase Connected Successfully");
-  </script>
+  notifyBtn.addEventListener("click", () => {
+    showToast("🔔 سيتم تفعيل الإشعارات قريباً");
+  });
+</script>
 
 </body>
 </html>
