@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>الدروس - منصة THE BEST</title>
+
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cairo&display=swap');
 
@@ -16,7 +17,6 @@
     transition: background 0.3s, color 0.3s;
   }
 
-  /* ✅ الشريط العلوي */
   .topbar {
     display: flex;
     align-items: center;
@@ -87,7 +87,6 @@
     transform: translateY(-3px);
   }
 
-  /* 📱 تحسين العرض على الموبايل */
   @media (max-width: 600px) {
     body {
       padding: 70px 10px 20px;
@@ -113,118 +112,142 @@
   }
 </style>
 </head>
+
 <body>
 
-  <!-- ✅ الشريط العلوي -->
+  <!-- الشريط العلوي -->
   <div class="topbar">
     <div class="menu-btn" id="backBtn">⬅</div>
     <div class="title">𝑳𝒆𝒄𝒕𝒖𝒓𝒆𝒔</div>
   </div>
 
   <h1>𝑳𝒆𝒄𝒕𝒖𝒓𝒆 – 𝟐𝟎𝟐𝟔</h1>
+
   <ul id="lectures-list">
     <li>⏳....𝑳𝒐𝒂𝒅𝒊𝒏𝒈</li>
   </ul>
 
-   <script src="app.js"></script>  <!-- أو المسار المناسب للملف -->
-
+  <!-- ملفاتك زي ما هي -->
+  <script src="app.js"></script>
   <script src="check_code.js"></script>
 
+  <!-- كودك الأساسي -->
+  <script type="module">
+    const lecturesList = document.getElementById("lectures-list");
+    const backBtn = document.getElementById("backBtn");
 
-<script type="module">
-const lecturesList = document.getElementById("lectures-list");
-const backBtn = document.getElementById("backBtn");
+    const selectedSubject = JSON.parse(localStorage.getItem("selected_subject"));
+    const selectedTeacher = JSON.parse(localStorage.getItem("selected_teacher"));
+    const selectedChapter = JSON.parse(localStorage.getItem("selected_chapter"));
 
-// جلب المادة والمدرس والفصل من localStorage
-const selectedSubject = JSON.parse(localStorage.getItem("selected_subject"));
-const selectedTeacher = JSON.parse(localStorage.getItem("selected_teacher"));
-const selectedChapter = JSON.parse(localStorage.getItem("selected_chapter"));
+    if (!selectedSubject || !selectedTeacher || !selectedChapter) {
+      lecturesList.innerHTML = '<li>⚠️ لم يتم تحديد المادة أو المدرس أو الفصل.</li>';
+    }
 
-if (!selectedSubject || !selectedTeacher || !selectedChapter) {
-  lecturesList.innerHTML = '<li>⚠️ لم يتم تحديد المادة أو المدرس أو الفصل.</li>';
-}
+    backBtn.onclick = () => {
+      window.location.href = 'chapters-a.html';
+    };
 
-// زر العودة
-backBtn.onclick = () => {
-  window.location.href = 'chapters-a.html';
-};
+    function normalize(str) {
+      return (str || "")
+        .trim()
+        .replace(/[.\s]/g, "")
+        .replace(/[أإآا]/g, "ا")
+        .toLowerCase();
+    }
 
-// دالة لتوحيد النصوص لتسهيل البحث
-function normalize(str) {
-  return (str || "")
-    .trim()
-    .replace(/[.\s]/g, "")
-    .replace(/[أإآا]/g, "ا")
-    .toLowerCase();
-}
+    async function loadLectures() {
+      if (!selectedSubject || !selectedTeacher || !selectedChapter) return;
 
-async function loadLectures() {
-  if (!selectedSubject || !selectedTeacher || !selectedChapter) return;
+      try {
+        const res = await fetch("organized_output-a.json");
+        const data = await res.json();
 
-  try {
-    const res = await fetch("organized_output-a.json");
-    const data = await res.json();
+        const wantedSubject = normalize(selectedSubject.name);
+        const wantedTeacher = normalize(selectedTeacher.name);
+        const wantedChapter = normalize(selectedChapter.name);
 
-    const wantedSubject = normalize(selectedSubject.name);
-    const wantedTeacher = normalize(selectedTeacher.name);
-    const wantedChapter = normalize(selectedChapter.name);
+        let foundLectures = [];
 
-    let foundLectures = [];
-
-    (data || []).forEach(year => {
-      (year.subjects || []).forEach(sub => {
-        if (normalize(sub.name) === wantedSubject) {
-          (sub.teachers || []).forEach(t => {
-            if (normalize(t.name) === wantedTeacher) {
-              (t.chapters || []).forEach(ch => {
-                if (normalize(ch.name) === wantedChapter) {
-                  foundLectures = ch.lectures || [];
+        (data || []).forEach(year => {
+          (year.subjects || []).forEach(sub => {
+            if (normalize(sub.name) === wantedSubject) {
+              (sub.teachers || []).forEach(t => {
+                if (normalize(t.name) === wantedTeacher) {
+                  (t.chapters || []).forEach(ch => {
+                    if (normalize(ch.name) === wantedChapter) {
+                      foundLectures = ch.lectures || [];
+                    }
+                  });
                 }
               });
             }
           });
+        });
+
+        lecturesList.innerHTML = "";
+
+        if (foundLectures.length === 0) {
+          lecturesList.innerHTML = "<li>⚠️ لا توجد محاضرات لهذا الفصل.</li>";
+          return;
         }
-      });
-    });
 
-    lecturesList.innerHTML = "";
+        foundLectures.forEach(lec => {
+          const li = document.createElement("li");
 
-    if (foundLectures.length === 0) {
-      lecturesList.innerHTML = "<li>⚠️ لا توجد محاضرات لهذا الفصل.</li>";
-      return;
+          const nameSpan = document.createElement("span");
+          nameSpan.textContent = lec.name;
+
+          const videoCount = document.createElement("div");
+          videoCount.style.fontSize = "0.85rem";
+          videoCount.style.color = "#ffd700";
+          videoCount.textContent = `${lec.videos?.length || 0} 𝑽𝒊𝒅𝒆𝒐`;
+
+          li.appendChild(nameSpan);
+          li.appendChild(videoCount);
+
+          li.onclick = () => {
+            localStorage.setItem(
+              'selected_lecture',
+              JSON.stringify({ name: lec.name })
+            );
+            window.location.href = 'videos-a.html';
+          };
+
+          lecturesList.appendChild(li);
+        });
+
+      } catch (err) {
+        console.error(err);
+        lecturesList.innerHTML = "<li>❌ حدث خطأ أثناء تحميل البيانات.</li>";
+      }
     }
 
-    // عرض المحاضرات مع عدد الفيديوهات لكل محاضرة
-    foundLectures.forEach(lec => {
-      const li = document.createElement("li");
+    loadLectures();
+  </script>
 
-      const nameSpan = document.createElement("span");
-      nameSpan.textContent = lec.name;
+  <!-- ================= Firebase (الإضافة الوحيدة) ================= -->
 
-      const videoCount = document.createElement("div");
-      videoCount.style.fontSize = "0.85rem";
-      videoCount.style.color = "#ffd700";
-      videoCount.textContent = `${lec.videos?.length || 0} 𝑽𝒊𝒅𝒆𝒐`;
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
-      li.appendChild(nameSpan);
-      li.appendChild(videoCount);
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAFrf9kRQez8ltkvd66_BQZPmARc1fW6y8",
+      authDomain: "date-student.firebaseapp.com",
+      databaseURL: "https://date-student-default-rtdb.firebaseio.com",
+      projectId: "date-student",
+      storageBucket: "date-student.firebasestorage.app",
+      messagingSenderId: "952213529741",
+      appId: "1:952213529741:web:7a8d8da275214b5754eec4",
+      measurementId: "G-CNR9HYEGGF"
+    };
 
-      li.onclick = () => {
-        localStorage.setItem('selected_lecture', JSON.stringify({ name: lec.name }));
-        window.location.href = 'videos-a.html';
-      };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-      lecturesList.appendChild(li);
-    });
-
-  } catch (err) {
-    console.error("❌ خطأ أثناء تحميل البيانات:", err);
-    lecturesList.innerHTML = "<li>❌ حدث خطأ أثناء تحميل البيانات.</li>";
-  }
-}
-
-loadLectures();
-</script>
+    console.log("🔥 Firebase Connected Successfully");
+  </script>
 
 </body>
 </html>
