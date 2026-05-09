@@ -2,34 +2,253 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Full Mark Player | المشغل الاحترافي</title>
-
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-
+    
     <style>
-        :root { 
-            --green-neon: #00F5C4; 
-            --main-bg: #042016; 
-            --panel-bg: rgba(0, 0, 0, 0.85); 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
         }
-        * { box-sizing: border-box; }
-        body { 
-            margin: 0; 
+
+        body {
+            margin: 0;
+            background: #000;
+            font-family: 'Cairo', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: white;
+            overflow: hidden;
+            transition: background 0.3s;
+        }
+
+        /* الوضع الفاتح */
+        body.light-mode {
+            background: #f5f7fc;
+        }
+        body.light-mode .top-header {
+            background: linear-gradient(to bottom, rgba(240,245,255,0.9), transparent);
+        }
+        body.light-mode .custom-controls {
+            background: linear-gradient(transparent, rgba(240,245,255,0.95));
+        }
+        body.light-mode .control-btn,
+        body.light-mode .time-text,
+        body.light-mode .video-title,
+        body.light-mode .back-btn-top {
+            color: #1a2a3a;
+        }
+        body.light-mode .settings-menu {
+            background: rgba(255,255,255,0.95);
+            color: #000;
+        }
+
+        .top-header {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            z-index: 100;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+            transition: opacity 0.4s, transform 0.4s;
+            opacity: 0;
+            transform: translateY(-20px);
+            pointer-events: none;
+        }
+
+        .show-ui .top-header,
+        .show-ui .custom-controls {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .back-btn-top { 
+            background: rgba(255, 255, 255, 0.1); 
+            color: white; 
+            padding: 8px 18px; 
+            border-radius: 40px; 
+            font-weight: bold; 
+            text-decoration: none; 
+            border: 1px solid rgba(255, 215, 0, 0.5); 
+            backdrop-filter: blur(12px); 
+            transition: 0.3s; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px;
+            font-size: 0.9rem;
+            pointer-events: auto;
+        }
+        .back-btn-top:hover { background: #ffd966; color: #000; border-color: #ffd966; }
+
+        .video-title { 
+            background: rgba(0,0,0,0.6); 
+            padding: 8px 18px; 
+            border-radius: 40px; 
+            border-right: 4px solid #ffd966; 
+            font-weight: bold;
+            font-size: 0.95rem;
+            max-width: 60%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            backdrop-filter: blur(8px);
+        }
+
+        .video-container { 
+            position: relative; 
+            width: 100%; 
+            max-width: 1400px; 
+            margin: auto; 
+            aspect-ratio: 16/9; 
             background: #000; 
-            font-family: 'Cairo', sans-serif; 
-            min-height: 100vh; 
+            overflow: hidden; 
+            box-shadow: 0 0 50px rgba(0, 245, 196, 0.2); 
+        }
+
+        .video-container:fullscreen { max-width: 100%; width: 100%; aspect-ratio: auto; }
+
+        video { width: 100%; height: 100%; object-fit: contain; cursor: pointer; }
+
+        .custom-controls { 
+            position: absolute; 
+            bottom: 0; left: 0; right: 0; 
+            background: linear-gradient(transparent, rgba(0,0,0,0.95)); 
+            padding: 20px 25px; 
+            transition: opacity 0.4s, transform 0.4s; 
             display: flex; 
             flex-direction: column; 
-            color: white; 
-            overflow: hidden; 
+            gap: 12px; 
+            z-index: 10; 
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
         }
-        /* === كل CSS كما هو بدون أي تغيير === */
+
+        .progress-area { 
+            height: 6px; 
+            background: rgba(255,255,255,0.2); 
+            cursor: pointer; 
+            position: relative; 
+            border-radius: 10px; 
+            transition: height 0.2s;
+        }
+        .progress-area:hover { height: 10px; }
+        .progress-bar { 
+            height: 100%; 
+            background: linear-gradient(90deg, #00F5C4, #FFD966);
+            width: 0%; 
+            position: absolute;
+            right: 0;
+            border-radius: 10px; 
+            box-shadow: 0 0 8px rgba(255,217,0,0.8);
+        }
+
+        .buttons-row { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+        }
+        .left-side, .right-side { display: flex; align-items: center; gap: 20px; }
+        
+        .control-btn { 
+            background: none; border: none; color: white; cursor: pointer; 
+            font-size: 1.4rem; transition: 0.2s; padding: 6px; 
+            display: flex; align-items: center; justify-content: center;
+            filter: drop-shadow(0 0 4px rgba(0,0,0,0.5));
+        }
+        .control-btn:hover { color: #ffd966; transform: scale(1.1); text-shadow: 0 0 8px gold; }
+
+        .time-text { font-size: 1rem; font-family: monospace; opacity: 0.9; margin-right: 5px; background: rgba(0,0,0,0.5); padding: 4px 10px; border-radius: 30px; }
+
+        .settings-menu { 
+            position: absolute; 
+            bottom: 85px; 
+            left: 25px; 
+            background: rgba(0, 0, 0, 0.85); 
+            backdrop-filter: blur(20px);
+            border-radius: 20px; 
+            padding: 8px; 
+            display: none; 
+            border: 1px solid rgba(255,215,0,0.5); 
+            min-width: 130px;
+            z-index: 20;
+        }
+        .settings-menu.active { display: block; }
+        .settings-menu button { 
+            display: block; width: 100%; background: none; border: none; 
+            color: white; padding: 10px; text-align: center; 
+            cursor: pointer; border-radius: 12px; font-family: 'Cairo';
+            transition: 0.2s;
+        }
+        .settings-menu button:hover { background: #ffd966; color: black; }
+
+        /* توست الإشعارات */
+        .toast-player {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1e2a32ee;
+            backdrop-filter: blur(16px);
+            padding: 10px 22px;
+            border-radius: 60px;
+            color: #ffec9f;
+            font-weight: bold;
+            z-index: 9999;
+            border-right: 4px solid #ffd966;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* زر مشاركة عائم إضافي */
+        .floating-share {
+            position: fixed;
+            bottom: 25px;
+            left: 25px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(12px);
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 200;
+            border: 1px solid #ffd966;
+            transition: 0.2s;
+        }
+        .floating-share:hover {
+            background: #ffd966;
+            transform: scale(1.1);
+        }
+        .floating-share i {
+            font-size: 1.3rem;
+            color: white;
+        }
+        .floating-share:hover i {
+            color: black;
+        }
+
+        @media (max-width: 600px) {
+            .custom-controls { padding: 12px; }
+            .control-btn { font-size: 1.1rem; }
+            .left-side, .right-side { gap: 10px; }
+            .video-title { font-size: 0.7rem; max-width: 50%; }
+        }
     </style>
 </head>
-
 <body class="show-ui">
 
     <div class="video-container" id="main-container">
@@ -50,67 +269,291 @@
             <div class="buttons-row">
                 <div class="left-side">
                     <button class="control-btn" id="play-pause"><i class="fas fa-play"></i></button>
-                    <button class="control-btn" onclick="skip(-10)"><i class="fas fa-backward"></i></button>
-                    <button class="control-btn" onclick="skip(10)"><i class="fas fa-forward"></i></button>
+                    <button class="control-btn" id="skip-back"><i class="fas fa-backward"></i></button>
+                    <button class="control-btn" id="skip-forward"><i class="fas fa-forward"></i></button>
                     <span class="time-text" id="time-display">00:00 / 00:00</span>
                 </div>
 
                 <div class="right-side">
                     <button class="control-btn" id="speed-settings"><i class="fas fa-tachometer-alt"></i></button>
                     <button class="control-btn" id="full-screen"><i class="fas fa-expand"></i></button>
+                    <button class="control-btn" id="theme-toggle"><i class="fas fa-moon"></i></button>
                 </div>
             </div>
 
             <div class="settings-menu" id="speed-menu">
-                <button onclick="setSpeed(0.5)">0.5x</button>
-                <button onclick="setSpeed(1)">عادية</button>
-                <button onclick="setSpeed(1.5)">1.5x</button>
-                <button onclick="setSpeed(2)">2.0x</button>
+                <p style="margin: 5px 0; font-size: 0.7rem; color: #ffd966; text-align: center;">السرعة</p>
+                <button data-speed="0.5">0.5x</button>
+                <button data-speed="1">عادية</button>
+                <button data-speed="1.5">1.5x</button>
+                <button data-speed="2">2.0x</button>
             </div>
         </div>
     </div>
 
-<!-- ================= FIREBASE (إضافة فقط) ================= -->
+    <div class="floating-share" id="floatingShare">
+        <i class="fas fa-share-alt"></i>
+    </div>
+
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getDatabase } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAFrf9kRQez8ltkvd66_BQZPmARc1fW6y8",
-  authDomain: "date-student.firebaseapp.com",
-  databaseURL: "https://date-student-default-rtdb.firebaseio.com",
-  projectId: "date-student",
-  storageBucket: "date-student.firebasestorage.app",
-  messagingSenderId: "952213529741",
-  appId: "1:952213529741:web:7a8d8da275214b5754eec4",
-  measurementId: "G-CNR9HYEGGF"
-};
+    // Firebase Config
+    const firebaseConfig = {
+        apiKey: "AIzaSyAFrf9kRQez8ltkvd66_BQZPmARc1fW6y8",
+        authDomain: "date-student.firebaseapp.com",
+        databaseURL: "https://date-student-default-rtdb.firebaseio.com",
+        projectId: "date-student",
+        storageBucket: "date-student.firebasestorage.app",
+        messagingSenderId: "952213529741",
+        appId: "1:952213529741:web:7a8d8da275214b5754eec4"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+    // بيانات الجلسة والتقدم
+    const userId = localStorage.getItem("deviceUserId") || ("user_" + Math.random().toString(36).substring(2, 10));
+    if (!localStorage.getItem("deviceUserId")) localStorage.setItem("deviceUserId", userId);
+    
+    const currentVideoId = localStorage.getItem("current_video_id");
+    const currentLectureId = localStorage.getItem("current_lecture_id");
+    const savedSources = JSON.parse(localStorage.getItem('video_sources') || '[]');
+    const videoTitleFromStorage = localStorage.getItem('video_title') || "المحاضرة";
+    
+    document.getElementById('display-title').innerText = videoTitleFromStorage;
 
-// 🔥 db جاهز للاستخدام مستقبلاً بدون التأثير على المشغل
-</script>
-<!-- ======================================================= -->
+    // عناصر التحكم
+    const video = document.getElementById('video-player');
+    const playBtn = document.getElementById('play-pause');
+    const progressBar = document.getElementById('progress-bar');
+    const progressArea = document.getElementById('progress-area');
+    const timeDisplay = document.getElementById('time-display');
+    const speedMenu = document.getElementById('speed-menu');
+    const container = document.getElementById('main-container');
+    const fullScreenBtn = document.getElementById('full-screen');
+    const skipBackBtn = document.getElementById('skip-back');
+    const skipForwardBtn = document.getElementById('skip-forward');
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const floatingShare = document.getElementById('floatingShare');
 
-<script>
-/* ===== كود المشغل بالكامل كما أرسلته بدون أي تعديل ===== */
+    let controlsTimeout;
 
-const video = document.getElementById('video-player');
-const playBtn = document.getElementById('play-pause');
-const progressBar = document.getElementById('progress-bar');
-const progressArea = document.getElementById('progress-area');
-const timeDisplay = document.getElementById('time-display');
-const speedMenu = document.getElementById('speed-menu');
-const container = document.getElementById('main-container');
-const fullScreenBtn = document.getElementById('full-screen');
+    // ======= دالة عرض توست =======
+    function showToast(msg) {
+        const toast = document.createElement('div');
+        toast.className = 'toast-player';
+        toast.innerText = msg;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
 
-const savedSources = JSON.parse(localStorage.getItem('video_sources') || '[]');
-const videoTitleFromStorage = localStorage.getItem('video_title') || "المحاضرة";
-const resumeTime = parseFloat(localStorage.getItem('resume_time') || '0');
-document.getElementById('display-title').innerText = videoTitleFromStorage;
+    // ======= حفظ التقدم في Firebase =======
+    async function saveProgressToFirebase(currentTime) {
+        if (!currentVideoId || !currentLectureId) return;
+        try {
+            const progressRef = ref(db, `progress/${userId}/lectures/${currentLectureId}/videos/${currentVideoId}`);
+            await set(progressRef, {
+                lastTime: currentTime,
+                updatedAt: Date.now(),
+                videoTitle: videoTitleFromStorage
+            });
+        } catch(e) { console.warn("Firebase save error:", e); }
+    }
 
-/* === باقي الكود كما هو حرفيًا === */
+    // ======= استرجاع التقدم من Firebase =======
+    async function loadProgressFromFirebase() {
+        if (!currentVideoId || !currentLectureId) return null;
+        try {
+            const snapshot = await get(child(ref(db), `progress/${userId}/lectures/${currentLectureId}/videos/${currentVideoId}/lastTime`));
+            return snapshot.val();
+        } catch(e) { return null; }
+    }
+
+    // ======= تنسيق الوقت =======
+    function formatTime(seconds) {
+        if (isNaN(seconds)) return "00:00";
+        const hrs = Math.floor(seconds / 3600);
+        const mins = Math.floor((seconds % 3600) / 60);
+        const secs = Math.floor(seconds % 60);
+        if (hrs > 0) return `${hrs.toString().padStart(2,'0')}:${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+        return `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+    }
+
+    // ======= تحديث شريط التقدم =======
+    function updateProgress() {
+        if (video.duration) {
+            const percent = (video.currentTime / video.duration) * 100;
+            progressBar.style.width = `${percent}%`;
+            timeDisplay.innerText = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
+        }
+    }
+
+    // ======= تحميل الفيديو مع HLS =======
+    function loadVideo() {
+        if (!savedSources.length) {
+            showToast("⚠️ لم يتم العثور على رابط الفيديو");
+            return;
+        }
+        const source = savedSources[0];
+        const videoUrl = source.stream_url || source.src || source;
+        
+        if (Hls.isSupported() && videoUrl.endsWith('.m3u8')) {
+            const hls = new Hls();
+            hls.loadSource(videoUrl);
+            hls.attachMedia(video);
+            hls.on(Hls.Events.MANIFEST_PARSED, async () => {
+                const savedTime = await loadProgressFromFirebase();
+                if (savedTime && savedTime > 5) {
+                    video.currentTime = savedTime;
+                    showToast(`⏱️ استئناف من ${formatTime(savedTime)}`);
+                }
+                video.play().catch(e => console.log);
+                // فتح الشاشة الكاملة تلقائياً (اختياري)
+                // container.requestFullscreen().catch(e=>console.log);
+            });
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            video.src = videoUrl;
+            video.addEventListener('loadedmetadata', async () => {
+                const savedTime = await loadProgressFromFirebase();
+                if (savedTime && savedTime > 5) video.currentTime = savedTime;
+                video.play();
+            });
+        } else {
+            video.src = videoUrl;
+            video.addEventListener('loadedmetadata', async () => {
+                const savedTime = await loadProgressFromFirebase();
+                if (savedTime && savedTime > 5) video.currentTime = savedTime;
+                video.play();
+            });
+        }
+    }
+
+    // ======= واجهة التحكم =======
+    function showUI() {
+        document.body.classList.add('show-ui');
+        clearTimeout(controlsTimeout);
+        if (!video.paused) {
+            controlsTimeout = setTimeout(() => document.body.classList.remove('show-ui'), 3000);
+        }
+    }
+
+    container.addEventListener('mousemove', showUI);
+    container.addEventListener('click', (e) => {
+        if (e.target.closest('.custom-controls') || e.target.closest('.top-header')) return;
+        showUI();
+        togglePlay();
+    });
+
+    function togglePlay() {
+        if (video.paused) {
+            video.play();
+            playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+        } else {
+            video.pause();
+            playBtn.innerHTML = '<i class="fas fa-play"></i>';
+        }
+        showUI();
+    }
+
+    function skip(seconds) {
+        video.currentTime += seconds;
+        showUI();
+    }
+
+    // ======= أحداث الفيديو =======
+    video.addEventListener('timeupdate', () => {
+        updateProgress();
+        // حفظ كل 5 ثوانٍ
+        if (Math.floor(video.currentTime) % 5 === 0 && video.currentTime > 0) {
+            saveProgressToFirebase(video.currentTime);
+        }
+    });
+
+    video.addEventListener('ended', () => {
+        showToast("🎉 اكتمل الفيديو! أحسنت");
+        saveProgressToFirebase(video.duration);
+    });
+
+    // ======= النقر على شريط التقدم =======
+    progressArea.addEventListener('click', (e) => {
+        const rect = progressArea.getBoundingClientRect();
+        const x = rect.right - e.clientX;
+        const percent = x / rect.width;
+        video.currentTime = percent * video.duration;
+        showUI();
+    });
+
+    // ======= أزرار التحكم =======
+    playBtn.addEventListener('click', togglePlay);
+    skipBackBtn.addEventListener('click', () => skip(-10));
+    skipForwardBtn.addEventListener('click', () => skip(10));
+
+    // ======= قائمة السرعة =======
+    const speedSettingsBtn = document.getElementById('speed-settings');
+    speedSettingsBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        speedMenu.classList.toggle('active');
+    });
+    document.querySelectorAll('#speed-menu button').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const speed = parseFloat(btn.getAttribute('data-speed'));
+            video.playbackRate = speed;
+            speedMenu.classList.remove('active');
+            showToast(`السرعة ${speed}x`);
+        });
+    });
+    document.addEventListener('click', () => speedMenu.classList.remove('active'));
+
+    // ======= الشاشة الكاملة =======
+    function toggleFullScreen() {
+        if (!document.fullscreenElement) container.requestFullscreen();
+        else document.exitFullscreen();
+    }
+    fullScreenBtn.addEventListener('click', toggleFullScreen);
+    document.addEventListener('fullscreenchange', () => {
+        fullScreenBtn.innerHTML = document.fullscreenElement ? '<i class="fas fa-compress"></i>' : '<i class="fas fa-expand"></i>';
+    });
+
+    // ======= الوضع الليلي/الفاتح =======
+    function setTheme(theme) {
+        if (theme === 'light') {
+            document.body.classList.add('light-mode');
+            themeToggleBtn.innerHTML = '<i class="fas fa-sun"></i>';
+        } else {
+            document.body.classList.remove('light-mode');
+            themeToggleBtn.innerHTML = '<i class="fas fa-moon"></i>';
+        }
+        localStorage.setItem('playerTheme', theme);
+    }
+    const savedTheme = localStorage.getItem('playerTheme') || 'dark';
+    setTheme(savedTheme);
+    themeToggleBtn.addEventListener('click', () => {
+        const newTheme = document.body.classList.contains('light-mode') ? 'dark' : 'light';
+        setTheme(newTheme);
+    });
+
+    // ======= مشاركة الفيديو =======
+    floatingShare.addEventListener('click', () => {
+        if (navigator.share) {
+            navigator.share({ title: videoTitleFromStorage, text: 'شاهد هذا الفيديو على منصة THE BEST', url: window.location.href });
+        } else {
+            showToast('المشاركة غير مدعومة في هذا المتصفح');
+        }
+    });
+
+    // ======= اختصارات لوحة المفاتيح =======
+    document.addEventListener('keydown', (e) => {
+        showUI();
+        if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
+        if (e.code === 'ArrowRight') skip(10);
+        if (e.code === 'ArrowLeft') skip(-10);
+        if (e.code === 'KeyF') toggleFullScreen();
+        if (e.code === 'KeyM') { video.muted = !video.muted; showUI(); }
+    });
+
+    // بدء تشغيل الفيديو
+    loadVideo();
 </script>
 
 </body>
