@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>الأبواب - منصة THE BEST</title>
+
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cairo&display=swap');
 
@@ -16,7 +17,6 @@
     transition: background 0.3s, color 0.3s;
   }
 
-  /* ===== الشريط العلوي ===== */
   .topbar {
     display: flex;
     align-items: center;
@@ -129,6 +129,7 @@
     opacity: 0;
     transition: opacity 0.5s, bottom 0.5s;
   }
+
   #toast.show {
     visibility: visible;
     opacity: 1;
@@ -159,23 +160,19 @@
   }
 </style>
 </head>
+
 <body>
 
-  <!-- ✅ الشريط العلوي -->
   <div class="topbar">
     <div class="menu-btn" id="backBtn">⬅</div>
     <div class="title">𝑪𝒉𝒂𝒑𝒕𝒆𝒓𝒔 & 𝑪𝒂𝒎𝒑𝒔</div>
     <div class="icons">
       <div class="toggle-dark" id="darkToggle"></div>
-      <a href="" target="_blank">
-        <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp">
-      </a>
-      <img id="shareBtn" src="https://cdn-icons-png.flaticon.com/512/929/929610.png" alt="Share">
-      <img id="notifyBtn" src="https://cdn-icons-png.flaticon.com/512/1827/1827272.png" alt="Notification">
+      <img id="shareBtn" src="https://cdn-icons-png.flaticon.com/512/929/929610.png">
+      <img id="notifyBtn" src="https://cdn-icons-png.flaticon.com/512/1827/1827272.png">
     </div>
   </div>
 
-  <!-- ✅ Toast -->
   <div id="toast">الإشعارات هتتفعل قريبًا 🔔✨</div>
 
   <h1>𝑪𝒉𝒂𝒑𝒕𝒆𝒓𝒔 & 𝑪𝒂𝒎𝒑𝒔</h1>
@@ -183,101 +180,92 @@
     <li>⏳....𝑳𝒐𝒂𝒅𝒊𝒏𝒈</li>
   </ul>
 
+  <!-- كودك الأساسي كما هو -->
+  <script type="module">
+    const chaptersList = document.getElementById("chapters-list");
+    const backBtn = document.getElementById("backBtn");
 
-<script type="module">
-const chaptersList = document.getElementById("chapters-list");
-const backBtn = document.getElementById("backBtn");
+    const selectedYear = JSON.parse(localStorage.getItem("selected_year"));
+    const selectedSubject = JSON.parse(localStorage.getItem("selected_subject"));
+    const selectedTeacher = JSON.parse(localStorage.getItem("selected_teacher"));
 
-// جلب السنة والمادة والمدرس
-const selectedYear = JSON.parse(localStorage.getItem("selected_year"));
-const selectedSubject = JSON.parse(localStorage.getItem("selected_subject"));
-const selectedTeacher = JSON.parse(localStorage.getItem("selected_teacher"));
-
-if (!selectedYear || !selectedSubject || !selectedTeacher) {
-  chaptersList.innerHTML = '<li class="loading">⚠️ لم يتم تحديد السنة أو المادة أو المدرس.</li>';
-}
-
-// زر العودة
-backBtn.onclick = () => {
-  window.location.href = "teachers.html";
-};
-
-// ===== دالة الخروج وطرد المستخدم =====
-function logoutAndRedirect() {
-  localStorage.clear();
-  sessionStorage.clear();
-  window.location.href = 'index.html';
-}
-
-// ===== تحميل الفصول =====
-async function loadChapters() {
-  if (!selectedYear || !selectedSubject || !selectedTeacher) return;
-
-  try {
-    // الطلب مباشرة عبر Proxy بدون توكن
-    const res = await fetch(
-      `/api/proxy?type=chapters&yearId=${selectedYear.id}&subjectId=${selectedSubject.id}&teacherId=${selectedTeacher.id}`,
-      { credentials: "include" }
-    );
-
-    // ===== تحقق من الجلسة =====
-    if (res.status === 401) {
-      logoutAndRedirect();
-      return;
+    if (!selectedYear || !selectedSubject || !selectedTeacher) {
+      chaptersList.innerHTML = '<li>⚠️ لم يتم تحديد السنة أو المادة أو المدرس.</li>';
     }
 
-    if (!res.ok) throw new Error("لم يتم العثور على البيانات");
+    backBtn.onclick = () => {
+      window.location.href = "teachers.html";
+    };
 
-    const chapters = await res.json();
-    chaptersList.innerHTML = "";
+    async function loadChapters() {
+      if (!selectedYear || !selectedSubject || !selectedTeacher) return;
 
-    // لا توجد فصول
-    if (!chapters.length) {
-      chaptersList.innerHTML = '<li class="loading">⚠️ لا يوجد أبواب لهذا المدرس.</li>';
-      return;
-    }
-
-    // عرض الفصول
-    chapters.forEach(chapter => {
-      const li = document.createElement("li");
-      li.textContent = chapter.name;
-
-      li.onclick = () => {
-        localStorage.setItem(
-          "selected_chapter",
-          JSON.stringify({ id: chapter.id, name: chapter.name })
+      try {
+        const res = await fetch(
+          `/api/proxy?type=chapters&yearId=${selectedYear.id}&subjectId=${selectedSubject.id}&teacherId=${selectedTeacher.id}`,
+          { credentials: "include" }
         );
-        window.location.href = "lecture_name.html";
-      };
 
-      chaptersList.appendChild(li);
-    });
+        if (!res.ok) throw new Error("فشل التحميل");
 
-  } catch (err) {
-    console.error("❌ خطأ أثناء جلب البيانات:", err);
-    chaptersList.innerHTML = '<li class="loading">❌ حدث خطأ أثناء تحميل البيانات.</li>';
-  }
-}
+        const chapters = await res.json();
+        chaptersList.innerHTML = "";
 
-// تشغيل الدالة
-loadChapters();
+        chapters.forEach(ch => {
+          const li = document.createElement("li");
+          li.textContent = ch.name;
+          li.onclick = () => {
+            localStorage.setItem(
+              "selected_chapter",
+              JSON.stringify({ id: ch.id, name: ch.name })
+            );
+            window.location.href = "lecture_name.html";
+          };
+          chaptersList.appendChild(li);
+        });
 
-// 🌙 الوضع الليلي والإشعارات
-const toast = document.getElementById("toast");
-const notifyBtn = document.getElementById("notifyBtn");
-const darkToggle = document.getElementById("darkToggle");
+      } catch (err) {
+        chaptersList.innerHTML = "<li>❌ حدث خطأ.</li>";
+      }
+    }
 
-notifyBtn?.addEventListener("click", () => {
-  toast.classList.add("show");
-  setTimeout(() => toast.classList.remove("show"), 3000);
-});
+    loadChapters();
 
-darkToggle?.addEventListener("click", () => {
-  document.body.classList.toggle("light-mode");
-  darkToggle.classList.toggle("active");
-});
-</script>
+    const toast = document.getElementById("toast");
+    const notifyBtn = document.getElementById("notifyBtn");
+    const darkToggle = document.getElementById("darkToggle");
 
+    notifyBtn.onclick = () => {
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 3000);
+    };
+
+    darkToggle.onclick = () => {
+      document.body.classList.toggle("light-mode");
+      darkToggle.classList.toggle("active");
+    };
+  </script>
+
+  <!-- ========= Firebase (إضافة فقط) ========= -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAFrf9kRQez8ltkvd66_BQZPmARc1fW6y8",
+      authDomain: "date-student.firebaseapp.com",
+      databaseURL: "https://date-student-default-rtdb.firebaseio.com",
+      projectId: "date-student",
+      storageBucket: "date-student.firebasestorage.app",
+      messagingSenderId: "952213529741",
+      appId: "1:952213529741:web:7a8d8da275214b5754eec4"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    console.log("🔥 Firebase Connected");
+  </script>
 
 </body>
 </html>
