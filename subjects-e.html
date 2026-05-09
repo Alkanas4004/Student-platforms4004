@@ -1,151 +1,456 @@
 <!DOCTYPE html>
-<html lang="en" dir="rtl">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>المواد - منصة THE BEST</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Cairo&display=swap');
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 
-/* ========== نفس CSS بتاعك بدون أي تغيير ========== */
-body {
-  font-family: 'Cairo', sans-serif;
-  background: #121212;
-  color: #fff;
-  padding: 80px 15px 30px;
-  margin: 0;
-  transition: background 0.3s, color 0.3s;
-}
-.topbar {
-  display:flex;align-items:center;justify-content:space-between;
-  background:#111;padding:10px 15px;position:fixed;
-  top:0;left:0;right:0;z-index:1000
-}
-.menu-btn{font-size:22px;cursor:pointer}
-.title{font-size:14px;color:#f36}
-.icons{display:flex;gap:12px}
-.icons img{width:22px;cursor:pointer}
-h1{text-align:center;color:#ffd700;margin-bottom:40px}
-ul{
-  list-style:none;padding:0;max-width:900px;margin:auto;
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:30px
-}
-li{
-  background:#1e1e1e;border-radius:16px;padding:20px 15px 30px;
-  cursor:pointer;text-align:center
-}
-.circle{
-  width:100px;height:100px;border-radius:50%;
-  background:#333;margin:0 auto 15px;
-  display:flex;align-items:center;justify-content:center
-}
-.circle img{width:80%;height:80%}
-li.loading{
-  grid-column:1/-1;background:none;color:#aaa;text-align:center
-}
-.profile-float-btn{
-  position:fixed;bottom:20px;left:20px;width:55px;height:55px;
-  border-radius:50%;background:#222;border:2px solid #ffd700;
-  display:flex;align-items:center;justify-content:center
-}
-.profile-float-btn img{width:28px}
+  body {
+    font-family: 'Cairo', sans-serif;
+    background: radial-gradient(circle at 10% 30%, #0a0f1a, #020408);
+    color: #f0f3f8;
+    padding: 80px 20px 40px;
+    transition: background 0.3s, color 0.2s;
+    min-height: 100vh;
+  }
+
+  /* الوضع الفاتح */
+  body.light-mode {
+    background: #fafbfd;
+    color: #1e2a3a;
+  }
+  body.light-mode .glass-topbar {
+    background: rgba(255, 248, 225, 0.9);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+  body.light-mode .subject-card {
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+    border: 1px solid rgba(0,0,0,0.05);
+  }
+  body.light-mode .subject-name {
+    color: #b85c00;
+  }
+
+  /* الشريط العلوي الزجاجي */
+  .glass-topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    background: rgba(10, 20, 28, 0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255,215,0,0.25);
+    z-index: 1000;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+  }
+
+  .menu-icon {
+    font-size: 1.7rem;
+    cursor: pointer;
+    color: #ffd966;
+  }
+
+  .page-title {
+    font-size: 1.3rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, #FFE6B0, #FFB347);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .icons-group {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+  }
+  .icon-circle {
+    width: 38px;
+    height: 38px;
+    background: rgba(255,240,180,0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.2s;
+    backdrop-filter: blur(4px);
+  }
+  .icon-circle:hover {
+    background: #ffd966;
+    transform: scale(1.05);
+  }
+  .icon-circle i {
+    font-size: 1.2rem;
+    color: #ffecb3;
+  }
+  body.light-mode .icon-circle i {
+    color: #b85c00;
+  }
+
+  /* زر التبديل الليلي */
+  .toggle-switch {
+    width: 48px;
+    height: 24px;
+    background: #555;
+    border-radius: 30px;
+    position: relative;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  .toggle-switch.active {
+    background: #ffd966;
+  }
+  .toggle-switch::after {
+    content: "🌙";
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.3s;
+  }
+  .toggle-switch.active::after {
+    content: "☀️";
+    right: 24px;
+  }
+
+  /* العنوان الرئيسي */
+  h1 {
+    font-size: 2.5rem;
+    text-align: center;
+    margin: 20px 0 40px;
+    font-weight: 900;
+    background: linear-gradient(145deg, #FFE6B0, #FFAA33);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* شبكة المواد */
+  .subjects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* بطاقة المادة */
+  .subject-card {
+    background: rgba(20, 28, 36, 0.75);
+    backdrop-filter: blur(12px);
+    border-radius: 36px;
+    padding: 24px 12px 20px;
+    transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    border: 1px solid rgba(255,215,0,0.3);
+    cursor: pointer;
+    text-align: center;
+    box-shadow: 0 14px 28px rgba(0,0,0,0.4);
+  }
+  .subject-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    border-color: #ffd966;
+    box-shadow: 0 24px 40px rgba(255,215,0,0.25);
+  }
+
+  .subject-icon {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background: #11161e;
+    margin: 0 auto 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #ffd966;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  }
+  .subject-icon img {
+    width: 80%;
+    height: 80%;
+    object-fit: contain;
+  }
+
+  .subject-name {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #ffdfa5;
+    margin-bottom: 6px;
+  }
+  .teacher-count {
+    background: rgba(255,215,0,0.15);
+    display: inline-block;
+    padding: 5px 16px;
+    border-radius: 40px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #ffd966;
+    margin-top: 8px;
+  }
+
+  /* Skeleton loader */
+  .skeleton-card {
+    background: linear-gradient(90deg, #2a2f36 25%, #3a414b 50%, #2a2f36 75%);
+    background-size: 200% 100%;
+    animation: loading 1.4s infinite;
+    border-radius: 36px;
+    height: 260px;
+  }
+  @keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* رسائل الخطأ */
+  .error-message {
+    text-align: center;
+    grid-column: 1 / -1;
+    background: rgba(255,70,70,0.2);
+    padding: 20px;
+    border-radius: 60px;
+    color: #ffb3b3;
+    border: 1px solid #ff8888;
+  }
+
+  /* توست الإشعارات */
+  .toast-message {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e2a32ee;
+    backdrop-filter: blur(16px);
+    padding: 12px 28px;
+    border-radius: 60px;
+    color: #ffec9f;
+    font-weight: bold;
+    z-index: 9999;
+    border-right: 5px solid #ffd966;
+    animation: fadeUp 0.3s ease;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; bottom: 0; }
+    to { opacity: 1; bottom: 30px; }
+  }
+
+  /* زر البروفايل العائم */
+  .profile-fab {
+    position: fixed;
+    bottom: 25px;
+    left: 25px;
+    background: #11161e;
+    width: 55px;
+    height: 55px;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.5);
+    cursor: pointer;
+    border: 2px solid #ffd966;
+    z-index: 1100;
+    transition: 0.2s;
+  }
+  .profile-fab:hover {
+    transform: scale(1.08);
+    background: #ffd966;
+  }
+  .profile-fab img {
+    width: 30px;
+  }
+  body.light-mode .profile-fab {
+    background: white;
+  }
+
+  @media (max-width: 640px) {
+    .subjects-grid { gap: 20px; }
+    .subject-name { font-size: 1.2rem; }
+    .subject-icon { width: 80px; height: 80px; }
+    .glass-topbar { padding: 10px 16px; }
+    .page-title { font-size: 1rem; }
+    h1 { font-size: 1.8rem; }
+  }
 </style>
 </head>
-
 <body>
 
-<div class="topbar">
-  <div class="menu-btn">☰</div>
-  <div class="title">𝑷𝒍𝒂𝒕𝒇𝒐𝒓𝒎 𝑻𝒉𝒆 𝑩𝒆𝒔𝒕 𝟐𝟎𝟐𝟔</div>
-  <div class="icons">
-    <div class="toggle-dark"></div>
-    <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png">
-    <img src="https://cdn-icons-png.flaticon.com/512/929/929610.png">
-    <img src="https://cdn-icons-png.flaticon.com/512/1827/1827272.png">
+<div class="glass-topbar">
+  <div class="menu-icon" id="menuIcon">☰</div>
+  <div class="page-title"><i class="fas fa-graduation-cap"></i> 𝑷𝒍𝒂𝒕𝒇𝒐𝒓𝒎 𝑻𝒉𝒆 𝑩𝒆𝒔𝒕 𝟐𝟎𝟐𝟔</div>
+  <div class="icons-group">
+    <div class="toggle-switch" id="darkToggle"></div>
+    <div class="icon-circle" id="shareBtn"><i class="fas fa-share-alt"></i></div>
+    <div class="icon-circle" id="whatsappBtn"><i class="fab fa-whatsapp"></i></div>
+    <div class="icon-circle" id="notifyBtn"><i class="far fa-bell"></i></div>
   </div>
 </div>
 
-<h1>𝑺𝒖𝒃𝒋𝒆𝒄𝒕𝒔 𝒄𝒍𝒂𝒔𝒔 𝒐𝒇 𝟐𝟎𝟐𝟔</h1>
+<h1>📚 المواد الدراسية 2026</h1>
+<div id="subjectsContainer" class="subjects-grid">
+  <div class="skeleton-card"></div>
+  <div class="skeleton-card"></div>
+  <div class="skeleton-card"></div>
+</div>
 
-<ul id="subjects-list">
-  <li class="loading">⏳ Loading...</li>
-</ul>
-
-<a href="profile.html" class="profile-float-btn">
-  <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png">
+<a href="profile.html" class="profile-fab" id="profileFab">
+  <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="بروفايل">
 </a>
 
-<!-- ================= Firebase ================= -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getDatabase, ref, child, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-/* 🔥 Firebase Config (بتاعك) */
-const firebaseConfig = {
-  apiKey: "AIzaSyAFrf9kRQez8ltkvd66_BQZPmARc1fW6y8",
-  authDomain: "date-student.firebaseapp.com",
-  databaseURL: "https://date-student-default-rtdb.firebaseio.com",
-  projectId: "date-student",
-  storageBucket: "date-student.firebasestorage.app",
-  messagingSenderId: "952213529741",
-  appId: "1:952213529741:web:7a8d8da275214b5754eec4",
-  measurementId: "G-CNR9HYEGGF"
-};
+  // Firebase config (Realtime Database)
+  const firebaseConfig = {
+    apiKey: "AIzaSyAFrf9kRQez8ltkvd66_BQZPmARc1fW6y8",
+    authDomain: "date-student.firebaseapp.com",
+    databaseURL: "https://date-student-default-rtdb.firebaseio.com",
+    projectId: "date-student",
+    storageBucket: "date-student.firebasestorage.app",
+    messagingSenderId: "952213529741",
+    appId: "1:952213529741:web:7a8d8da275214b5754eec4"
+  };
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+  // جلب السنة المختارة من localStorage
+  const selectedYear = JSON.parse(localStorage.getItem("selected_year"));
+  const subjectsContainer = document.getElementById("subjectsContainer");
 
-const subjectImages = {
-  "أحياء":"https://www2.0zz0.com/2025/11/03/16/425588580.jpg",
-  "فيزياء":"https://www2.0zz0.com/2025/11/03/16/155373686.jpg",
-  "كيمياء":"https://www2.0zz0.com/2025/11/03/16/286845048.jpg"
-};
+  // صور المواد
+  const subjectImages = {
+    "أحياء": "https://www2.0zz0.com/2025/11/03/16/425588580.jpg",
+    "فيزياء": "https://www2.0zz0.com/2025/11/03/16/155373686.jpg",
+    "كيمياء": "https://www2.0zz0.com/2025/11/03/16/286845048.jpg",
+    "لغة عربية": "https://www2.0zz0.com/2025/11/06/06/128992456.jpg",
+    "English": "https://www2.0zz0.com/2025/11/03/16/386429473.jpg",
+    "جيولوجيا": "https://www2.0zz0.com/2025/11/03/22/343667596.jpg",
+    "الرياضيات": "https://www2.0zz0.com/2025/11/03/22/428968592.jpg",
+    "ادبي": "https://www2.0zz0.com/2025/10/01/19/580067879.jpeg",
+    "Le français": "https://img.icons8.com/color/100/000000/france.png"
+  };
 
-const list = document.getElementById("subjects-list");
-const selectedYear = JSON.parse(localStorage.getItem("selected_year"));
-
-onAuthStateChanged(auth, user => {
-  if(!user){
-    localStorage.clear();
-    location.href="index.html";
-    return;
+  // دالة عرض التوست
+  function showToast(msg, isError = false) {
+    const toast = document.createElement("div");
+    toast.className = "toast-message";
+    toast.innerHTML = isError ? `⚠️ ${msg}` : `✨ ${msg}`;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3500);
   }
-  if(!selectedYear){
-    list.innerHTML='<li class="loading">❌ لم يتم اختيار سنة</li>';
-    return;
-  }
-  loadSubjects(selectedYear.id);
-});
 
-async function loadSubjects(yearId){
-  list.innerHTML='<li class="loading">⏳ Loading...</li>';
-  const snap = await getDocs(collection(db,"years",yearId,"subjects"));
-  list.innerHTML="";
-  if(snap.empty){
-    list.innerHTML='<li class="loading">❌ لا توجد مواد</li>';
-    return;
+  // تحميل المواد من Realtime Database
+  async function loadSubjects() {
+    if (!selectedYear) {
+      subjectsContainer.innerHTML = `<div class="error-message">❌ لم يتم اختيار السنة الدراسية. الرجاء العودة إلى الصفحة الرئيسية.</div>`;
+      return;
+    }
+
+    try {
+      const path = `years/${selectedYear.id}/subjects`;
+      const snapshot = await get(child(ref(db), path));
+      const subjectsData = snapshot.val();
+
+      if (!subjectsData) {
+        subjectsContainer.innerHTML = `<div class="error-message">📭 لا توجد مواد متاحة لهذه السنة.</div>`;
+        return;
+      }
+
+      subjectsContainer.innerHTML = "";
+
+      // تحويل الكائن إلى مصفوفة
+      const subjectsArray = Object.entries(subjectsData).map(([id, subject]) => ({ id, ...subject }));
+
+      for (const subject of subjectsArray) {
+        const teachersCount = subject.teachers ? Object.keys(subject.teachers).length : 0;
+        const imgSrc = subjectImages[subject.name] || "https://img.icons8.com/ios-filled/100/ffd700/book.png";
+
+        const card = document.createElement("div");
+        card.className = "subject-card";
+        card.innerHTML = `
+          <div class="subject-icon">
+            <img src="${imgSrc}" alt="${subject.name}">
+          </div>
+          <div class="subject-name">${subject.name}</div>
+          <div class="teacher-count">
+            <i class="fas fa-chalkboard-user"></i> ${teachersCount} ${teachersCount === 1 ? 'مدرس' : 'مدرسين'}
+          </div>
+        `;
+
+        card.addEventListener("click", () => {
+          localStorage.setItem("selected_subject", JSON.stringify({ id: subject.id, name: subject.name }));
+          window.location.href = "teachers-e.html";
+        });
+
+        subjectsContainer.appendChild(card);
+      }
+    } catch (error) {
+      console.error(error);
+      subjectsContainer.innerHTML = `<div class="error-message">❌ حدث خطأ في الاتصال بقاعدة البيانات</div>`;
+      showToast("فشل تحميل المواد", true);
+    }
   }
-  snap.forEach(doc=>{
-    const s=doc.data();
-    const li=document.createElement("li");
-    li.innerHTML=`
-      <div class="circle">
-        <img src="${subjectImages[s.name]||'https://img.icons8.com/ios-filled/100/ffd700/book.png'}">
-      </div>
-      <span>${s.name}</span>
-      <div style="color:#ffd700;font-size:.9rem">${s.teachers_count||0} Teacher</div>
-    `;
-    li.onclick=()=>{
-      localStorage.setItem("selected_subject",JSON.stringify({...s,id:doc.id}));
-      location.href="teachers-e.html";
-    };
-    list.appendChild(li);
+
+  loadSubjects();
+
+  // ========== الوضع الليلي والفاتح ==========
+  const darkToggle = document.getElementById("darkToggle");
+  if (localStorage.getItem("theme") === "light") {
+    document.body.classList.add("light-mode");
+    darkToggle.classList.add("active");
+  }
+  darkToggle.addEventListener("click", () => {
+    document.body.classList.toggle("light-mode");
+    const isLight = document.body.classList.contains("light-mode");
+    localStorage.setItem("theme", isLight ? "light" : "dark");
+    darkToggle.classList.toggle("active", isLight);
   });
-}
-</script>
 
+  // ========== مشاركة وواتساب ==========
+  const shareBtn = document.getElementById("shareBtn");
+  const whatsappBtn = document.getElementById("whatsappBtn");
+  const notifyBtn = document.getElementById("notifyBtn");
+  const menuIcon = document.getElementById("menuIcon");
+
+  shareBtn.addEventListener("click", () => {
+    if (navigator.share) {
+      navigator.share({ title: "منصة THE BEST", text: "استعرض المواد الدراسية", url: location.href });
+    } else {
+      showToast("المشاركة غير مدعومة في هذا المتصفح", true);
+    }
+  });
+
+  whatsappBtn.addEventListener("click", () => {
+    window.open(`https://wa.me/?text=${encodeURIComponent(location.href)}`, "_blank");
+  });
+
+  notifyBtn.addEventListener("click", () => {
+    showToast("🔔 سيتم تفعيل الإشعارات قريباً");
+  });
+
+  menuIcon.addEventListener("click", () => {
+    showToast("✨ القائمة الجانبية قريباً");
+  });
+</script>
 </body>
 </html>
