@@ -2,276 +2,479 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>المدرسون - منصة THE BEST</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Cairo&display=swap');
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 
-body {
-  font-family: 'Cairo', sans-serif;
-  background: #121212;
-  color: #fff;
-  padding: 80px 15px 30px;
-  margin: 0;
-  transition: background 0.3s, color 0.3s;
-}
+  body {
+    font-family: 'Cairo', sans-serif;
+    background: radial-gradient(circle at 10% 30%, #0a0f1a, #020408);
+    color: #f0f3f8;
+    padding: 80px 20px 40px;
+    transition: background 0.3s, color 0.2s;
+    min-height: 100vh;
+  }
 
-/* ===== الشريط العلوي ===== */
-.topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #111;
-  padding: 10px 15px;
-  color: white;
-  position: fixed;
-  top: 0;
-  right: 0;
-  left: 0;
-  z-index: 1000;
-  transition: background 0.3s, color 0.3s;
-}
+  /* الوضع الفاتح */
+  body.light-mode {
+    background: #fafbfd;
+    color: #1e2a3a;
+  }
+  body.light-mode .glass-topbar {
+    background: rgba(255, 248, 225, 0.9);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+  body.light-mode .teacher-card {
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+    border: 1px solid rgba(0,0,0,0.05);
+  }
+  body.light-mode .teacher-name {
+    color: #b85c00;
+  }
+  body.light-mode .subject-img {
+    opacity: 0.9;
+  }
 
-.menu-btn {
-  font-size: 22px;
-  cursor: pointer;
-}
+  /* الشريط العلوي الزجاجي */
+  .glass-topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    background: rgba(10, 20, 28, 0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255,215,0,0.25);
+    z-index: 1000;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+  }
 
-.title {
-  font-size: 14px;
-  color: #f36;
-}
+  .back-btn {
+    background: rgba(255,215,0,0.12);
+    border: 1px solid #ffd966;
+    color: #ffd966;
+    padding: 6px 18px;
+    border-radius: 40px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 0.9rem;
+  }
+  .back-btn:hover {
+    background: #ffd966;
+    color: #000;
+    transform: translateX(-4px);
+  }
 
-.icons {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
+  .page-title {
+    font-size: 1.4rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, #FFE6B0, #FFB347);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
 
-.icons img {
-  width: 22px;
-  height: 22px;
-  cursor: pointer;
-}
+  .icons-group {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+  }
+  .icon-circle {
+    width: 38px;
+    height: 38px;
+    background: rgba(255,240,180,0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.2s;
+    backdrop-filter: blur(4px);
+  }
+  .icon-circle:hover {
+    background: #ffd966;
+    transform: scale(1.05);
+  }
+  .icon-circle i {
+    font-size: 1.2rem;
+    color: #ffecb3;
+  }
+  body.light-mode .icon-circle i {
+    color: #b85c00;
+  }
 
-.toggle-dark {
-  background: #fff;
-  border-radius: 12px;
-  width: 40px;
-  height: 20px;
-  position: relative;
-  cursor: pointer;
-}
+  /* زر التبديل الليلي */
+  .toggle-switch {
+    width: 48px;
+    height: 24px;
+    background: #555;
+    border-radius: 30px;
+    position: relative;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  .toggle-switch.active {
+    background: #ffd966;
+  }
+  .toggle-switch::after {
+    content: "🌙";
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.3s;
+  }
+  .toggle-switch.active::after {
+    content: "☀️";
+    right: 24px;
+  }
 
-.toggle-dark::after {
-  content: "";
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 16px;
-  height: 16px;
-  background: #111;
-  border-radius: 50%;
-  transition: 0.3s;
-}
+  /* العنوان الرئيسي */
+  h1 {
+    font-size: 2.5rem;
+    text-align: center;
+    margin: 20px 0 40px;
+    font-weight: 900;
+    background: linear-gradient(145deg, #FFE6B0, #FFAA33);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: none;
+  }
 
-.toggle-dark.active::after {
-  left: 22px;
-  background: #ff0;
-}
+  /* شبكة المدرسين */
+  .teachers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 32px;
+    max-width: 1300px;
+    margin: 0 auto;
+  }
 
-h1 {
-  color: #ffd700;
-  text-align: center;
-  margin-bottom: 20px;
-  text-shadow: 0 0 8px #ffd700;
-}
+  /* بطاقة المدرس */
+  .teacher-card {
+    background: rgba(20, 28, 36, 0.75);
+    backdrop-filter: blur(12px);
+    border-radius: 36px;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    border: 1px solid rgba(255,215,0,0.3);
+    cursor: pointer;
+    box-shadow: 0 14px 28px rgba(0,0,0,0.4);
+  }
+  .teacher-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    border-color: #ffd966;
+    box-shadow: 0 24px 40px rgba(255,215,0,0.25);
+  }
 
-ul {
-  list-style: none;
-  padding: 0;
-  max-width: 500px;
-  margin: 0 auto;
-}
+  .subject-img {
+    width: 100%;
+    height: 170px;
+    object-fit: cover;
+    border-bottom: 2px solid rgba(255,215,0,0.4);
+  }
 
-li {
-  background:#1a1a1a;
-  margin:15px 0;
-  padding:15px;
-  border-radius:12px;
-  cursor:pointer;
-  text-align:center;
-  font-weight:bold;
-  color:#ffd700;
-  transition: background 0.3s, transform 0.3s;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  overflow:hidden;
-}
+  .teacher-avatar {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    border: 4px solid #ffd966;
+    margin: -55px auto 12px;
+    background: #111;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  }
+  .teacher-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 
-li:hover {
-  background:#333;
-  transform: translateY(-5px);
-}
+  .teacher-name {
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: #ffdfa5;
+    text-align: center;
+    margin: 10px 0 5px;
+  }
+  .chapters-badge {
+    text-align: center;
+    background: rgba(255,215,0,0.15);
+    display: inline-block;
+    width: fit-content;
+    margin: 0 auto 20px;
+    padding: 6px 18px;
+    border-radius: 40px;
+    font-weight: bold;
+    font-size: 0.85rem;
+    color: #ffd966;
+    backdrop-filter: blur(4px);
+  }
+  .fa-book-open {
+    margin-left: 6px;
+  }
 
-.subject-img {
-  width:100%;
-  height:150px;
-  object-fit:cover;
-  border-radius:10px;
-  margin-bottom:12px;
-}
+  /* Skeleton loader */
+  .skeleton-card {
+    background: linear-gradient(90deg, #2a2f36 25%, #3a414b 50%, #2a2f36 75%);
+    background-size: 200% 100%;
+    animation: loading 1.4s infinite;
+    border-radius: 36px;
+    height: 360px;
+  }
+  @keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
 
-.teacher-circle {
-  width:90px;
-  height:90px;
-  border-radius:50%;
-  background:#222;
-  border:3px solid #ffd700;
-  overflow:hidden;
-  margin-bottom:10px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
+  /* رسائل الخطأ */
+  .error-message {
+    text-align: center;
+    grid-column: 1 / -1;
+    background: rgba(255,70,70,0.2);
+    padding: 20px;
+    border-radius: 60px;
+    color: #ffb3b3;
+    border: 1px solid #ff8888;
+  }
 
-.teacher-circle img {
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  border-radius:50%;
-}
+  /* توست الإشعارات */
+  .toast-message {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e2a32ee;
+    backdrop-filter: blur(16px);
+    padding: 12px 28px;
+    border-radius: 60px;
+    color: #ffec9f;
+    font-weight: bold;
+    z-index: 9999;
+    border-right: 5px solid #ffd966;
+    animation: fadeUp 0.3s ease;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; bottom: 0; }
+    to { opacity: 1; bottom: 30px; }
+  }
 
-#toast {
-  visibility: hidden;
-  min-width: 260px;
-  background: #1e1e1e;
-  color: #ffd700;
-  text-align: center;
-  border-radius: 12px;
-  padding: 14px;
-  position: fixed;
-  z-index: 2000;
-  left: 50%;
-  bottom: 30px;
-  transform: translateX(-50%);
-  font-size: 1rem;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-  opacity: 0;
-  transition: opacity 0.5s, bottom 0.5s;
-}
+  /* زر البروفايل العائم */
+  .profile-fab {
+    position: fixed;
+    bottom: 25px;
+    left: 25px;
+    background: #11161e;
+    width: 55px;
+    height: 55px;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.5);
+    cursor: pointer;
+    border: 2px solid #ffd966;
+    z-index: 1100;
+    transition: 0.2s;
+  }
+  .profile-fab:hover {
+    transform: scale(1.08);
+    background: #ffd966;
+  }
+  .profile-fab img {
+    width: 30px;
+  }
+  body.light-mode .profile-fab {
+    background: white;
+  }
 
-#toast.show {
-  visibility: visible;
-  opacity: 1;
-  bottom: 50px;
-}
-
-body.light-mode {
-  background: #f5f5f5;
-  color: #000;
-}
+  @media (max-width: 640px) {
+    .teachers-grid { gap: 20px; }
+    .teacher-name { font-size: 1.3rem; }
+    .subject-img { height: 140px; }
+    .glass-topbar { padding: 10px 16px; }
+    .page-title { font-size: 1rem; }
+  }
 </style>
 </head>
-
 <body>
 
-<div class="topbar">
-  <div class="menu-btn" onclick="window.location.href='subjects-e.html'">⬅</div>
-  <div class="title">𝑺𝒖𝒃𝒋𝒆𝒄𝒕 𝑻𝒆𝒂𝒄𝒉𝒆𝒓𝒔</div>
-  <div class="icons">
-    <div class="toggle-dark" id="darkToggle"></div>
-    <img id="shareBtn" src="https://cdn-icons-png.flaticon.com/512/929/929610.png">
-    <img id="notifyBtn" src="https://cdn-icons-png.flaticon.com/512/1827/1827272.png">
+<div class="glass-topbar">
+  <button class="back-btn" id="backBtn">⬅️ رجوع</button>
+  <div class="page-title"><i class="fas fa-chalkboard-user"></i> 𝑺𝒖𝒃𝒋𝒆𝒄𝒕 𝑻𝒆𝒂𝒄𝒉𝒆𝒓𝒔</div>
+  <div class="icons-group">
+    <div class="toggle-switch" id="darkToggle"></div>
+    <div class="icon-circle" id="shareBtn"><i class="fas fa-share-alt"></i></div>
+    <div class="icon-circle" id="whatsappBtn"><i class="fab fa-whatsapp"></i></div>
+    <div class="icon-circle" id="notifyBtn"><i class="far fa-bell"></i></div>
   </div>
 </div>
 
-<div id="toast">الإشعارات هتتفعل قريبًا 🔔✨</div>
+<h1>🏆 أساتذة المادة</h1>
+<div id="teachersContainer" class="teachers-grid">
+  <div class="skeleton-card"></div>
+  <div class="skeleton-card"></div>
+  <div class="skeleton-card"></div>
+</div>
 
-<h1>𝑺𝒖𝒃𝒋𝒆𝒄𝒕 𝑻𝒆𝒂𝒄𝒉𝒆𝒓𝒔</h1>
-<ul id="teachers-list">
-  <li>⏳....𝑳𝒐𝒂𝒅𝒊𝒏𝒈</li>
-</ul>
+<a href="profile.html" class="profile-fab" id="profileFab">
+  <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="بروفايل">
+</a>
 
-<script src="check_code.js"></script>
-
-<!-- ✅ Firebase + الكود الأساسي -->
 <script type="module">
-/* ================= FIREBASE ================= */
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getDatabase } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getDatabase, ref, child, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAFrf9kRQez8ltkvd66_BQZPmARc1fW6y8",
-  authDomain: "date-student.firebaseapp.com",
-  databaseURL: "https://date-student-default-rtdb.firebaseio.com",
-  projectId: "date-student",
-  storageBucket: "date-student.firebasestorage.app",
-  messagingSenderId: "952213529741",
-  appId: "1:952213529741:web:7a8d8da275214b5754eec4",
-  measurementId: "G-CNR9HYEGGF"
-};
+  // Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyAFrf9kRQez8ltkvd66_BQZPmARc1fW6y8",
+    authDomain: "date-student.firebaseapp.com",
+    databaseURL: "https://date-student-default-rtdb.firebaseio.com",
+    projectId: "date-student",
+    storageBucket: "date-student.firebasestorage.app",
+    messagingSenderId: "952213529741",
+    appId: "1:952213529741:web:7a8d8da275214b5754eec4"
+  };
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-/* =========================================== */
+  // جلب البيانات المحفوظة
+  const selectedYear = JSON.parse(localStorage.getItem("selected_year"));
+  const selectedSubject = JSON.parse(localStorage.getItem("selected_subject"));
+  const teachersContainer = document.getElementById("teachersContainer");
+  const backBtn = document.getElementById("backBtn");
 
-const teachersList = document.getElementById('teachers-list');
+  backBtn.onclick = () => window.location.href = "subjects-e.html";
 
-const subjectImages = {
-  "أحياء": "https://www2.0zz0.com/2025/11/03/16/425588580.jpg",
-  "فيزياء": "https://www2.0zz0.com/2025/11/03/16/155373686.jpg",
-  "كيمياء": "https://www2.0zz0.com/2025/11/03/16/286845048.jpg",
-  "لغة عربية": "https://www2.0zz0.com/2025/11/06/06/128992456.jpg",
-  "English": "https://www2.0zz0.com/2025/11/03/16/386429473.jpg",
-  "جيولوجيا": "https://www2.0zz0.com/2025/11/03/22/343667596.jpg",
-  "الرياضيات": "https://www2.0zz0.com/2025/11/03/22/428968592.jpg",
-  "ادبي": "https://www2.0zz0.com/2025/10/01/19/580067879.jpeg"
-};
+  // صور المواد
+  const subjectImages = {
+    "أحياء": "https://www2.0zz0.com/2025/11/03/16/425588580.jpg",
+    "فيزياء": "https://www2.0zz0.com/2025/11/03/16/155373686.jpg",
+    "كيمياء": "https://www2.0zz0.com/2025/11/03/16/286845048.jpg",
+    "لغة عربية": "https://www2.0zz0.com/2025/11/06/06/128992456.jpg",
+    "English": "https://www2.0zz0.com/2025/11/03/16/386429473.jpg",
+    "جيولوجيا": "https://www2.0zz0.com/2025/11/03/22/343667596.jpg",
+    "الرياضيات": "https://www2.0zz0.com/2025/11/03/22/428968592.jpg",
+    "ادبي": "https://www2.0zz0.com/2025/10/01/19/580067879.jpeg"
+  };
 
-const selectedSubject = JSON.parse(localStorage.getItem("selected_subject"));
-const selectedYear = JSON.parse(localStorage.getItem("selected_year"));
+  // دالة عرض التوست
+  function showToast(msg, isError = false) {
+    const toast = document.createElement("div");
+    toast.className = "toast-message";
+    toast.innerHTML = isError ? `⚠️ ${msg}` : `✨ ${msg}`;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3500);
+  }
 
-if (!selectedSubject || !selectedYear) {
-  teachersList.innerHTML = '<li>⚠️ لم يتم اختيار السنة أو المادة</li>';
-} else {
-  loadTeachers(selectedYear.id, selectedSubject.id);
-}
+  // تحميل المدرسين من Firebase
+  async function loadTeachersFromFirebase() {
+    if (!selectedYear || !selectedSubject) {
+      teachersContainer.innerHTML = `<div class="error-message">⚠️ لم يتم تحديد السنة أو المادة</div>`;
+      return;
+    }
 
-async function loadTeachers(yearId, subjectId) {
-  const res = await fetch(`/api/proxy1?type=teachers&yearId=${yearId}&subjectId=${subjectId}`);
-  const teachers = await res.json();
-  teachersList.innerHTML = "";
+    try {
+      const path = `years/${selectedYear.id}/subjects/${selectedSubject.id}/teachers`;
+      const snapshot = await get(child(ref(db), path));
+      const teachersData = snapshot.val();
 
-  teachers.forEach(teacher => {
-    const li = document.createElement('li');
-    li.innerHTML = `
-      <img class="subject-img" src="${subjectImages[selectedSubject.name]}">
-      <div class="teacher-circle">
-        <img src="${teacher.image_url || 'https://img.icons8.com/ios-filled/100/ffd700/user-male-circle.png'}">
-      </div>
-      <span>${teacher.name}</span>
-      <div>${teacher.chapters_count || 0} Chapter</div>
-    `;
-    li.onclick = () => {
-      localStorage.setItem('selected_teacher', JSON.stringify(teacher));
-      location.href = 'chapters-e.html';
-    };
-    teachersList.appendChild(li);
+      if (!teachersData) {
+        teachersContainer.innerHTML = `<div class="error-message">📭 لا يوجد مدرسون لهذه المادة بعد.</div>`;
+        return;
+      }
+
+      teachersContainer.innerHTML = "";
+
+      // تحويل الكائن إلى مصفوفة
+      const teachersArray = Object.entries(teachersData).map(([id, teacher]) => ({ id, ...teacher }));
+
+      for (const teacher of teachersArray) {
+        const chaptersCount = teacher.chapters ? Object.keys(teacher.chapters).length : 0;
+        const teacherImage = teacher.image_url || "https://img.icons8.com/ios-filled/100/ffd700/user-male-circle.png";
+        const subjectImg = subjectImages[selectedSubject.name] || "https://img.icons8.com/ios-filled/100/ffd700/book.png";
+
+        const card = document.createElement("div");
+        card.className = "teacher-card";
+        card.innerHTML = `
+          <img class="subject-img" src="${subjectImg}" alt="${selectedSubject.name}">
+          <div class="teacher-avatar">
+            <img src="${teacherImage}" alt="${teacher.name}">
+          </div>
+          <div class="teacher-name">${teacher.name}</div>
+          <div class="chapters-badge">
+            <i class="fas fa-book-open"></i> ${chaptersCount} ${chaptersCount === 1 ? 'باب' : 'أبواب'}
+          </div>
+        `;
+
+        card.addEventListener("click", () => {
+          localStorage.setItem("selected_teacher", JSON.stringify({ id: teacher.id, name: teacher.name, image_url: teacherImage }));
+          window.location.href = "chapters-e.html";
+        });
+
+        teachersContainer.appendChild(card);
+      }
+    } catch (error) {
+      console.error(error);
+      teachersContainer.innerHTML = `<div class="error-message">❌ حدث خطأ في الاتصال بقاعدة البيانات</div>`;
+      showToast("فشل تحميل المدرسين", true);
+    }
+  }
+
+  loadTeachersFromFirebase();
+
+  // ========== الوضع الليلي والفاتح ==========
+  const darkToggle = document.getElementById("darkToggle");
+  if (localStorage.getItem("theme") === "light") {
+    document.body.classList.add("light-mode");
+    darkToggle.classList.add("active");
+  }
+  darkToggle.addEventListener("click", () => {
+    document.body.classList.toggle("light-mode");
+    const isLight = document.body.classList.contains("light-mode");
+    localStorage.setItem("theme", isLight ? "light" : "dark");
+    darkToggle.classList.toggle("active", isLight);
   });
-}
 
-document.getElementById('notifyBtn').onclick = () => {
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 3000);
-};
+  // ========== مشاركة وواتساب ==========
+  const shareBtn = document.getElementById("shareBtn");
+  const whatsappBtn = document.getElementById("whatsappBtn");
+  const notifyBtn = document.getElementById("notifyBtn");
 
-document.getElementById('darkToggle').onclick = () => {
-  document.body.classList.toggle('light-mode');
-};
+  shareBtn.addEventListener("click", () => {
+    if (navigator.share) {
+      navigator.share({ title: "منصة THE BEST", text: "تعرف على أساتذة المادة", url: location.href });
+    } else {
+      showToast("المشاركة غير مدعومة في هذا المتصفح", true);
+    }
+  });
+
+  whatsappBtn.addEventListener("click", () => {
+    window.open(`https://wa.me/?text=${encodeURIComponent(location.href)}`, "_blank");
+  });
+
+  notifyBtn.addEventListener("click", () => {
+    showToast("🔔 سيتم تفعيل الإشعارات الفورية قريباً");
+  });
 </script>
-
 </body>
 </html>
